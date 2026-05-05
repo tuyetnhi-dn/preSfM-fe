@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appName": "PreSfM",
+    "status": "Trang thai",
+    "stage": "Giai doan",
+    "idle": "dang cho",
+    "notStarted": "chua bat dau"
+  },
+  "home": {
+    "title": "Trung tam dieu khien PreSfM",
+    "description": "Giam sat tien xu ly video, chat luong tai dung va dau ra 3D trong mot workspace.",
+    "login": "Dang nhap",
+    "openDashboard": "Mo Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Du an",
+    "viewer": "Trinh xem 3D"
+  },
+  "auth": {
+    "loginTitle": "Đăng nhập",
+    "loginSubtitle": "Truy cập workspace PreSfM của bạn",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "signingIn": "Đang đăng nhập...",
+    "login": "Đăng nhập",
+    "newUser": "Người dùng mới?",
+    "registerWithOtp": "Đăng ký với OTP",
+    "registerTitle": "Đăng ký với OTP",
+    "registerSubtitle": "Tạo tài khoản và xác minh email bằng OTP.",
+    "otpCode": "Mã OTP",
+    "sendOtp": "Gửi OTP",
+    "resend": "Gửi lại",
+    "creatingAccount": "Đang tạo tài khoản...",
+    "register": "Đăng ký",
+    "alreadyHaveAccount": "Đã có tài khoản?"
+  },
+  "dashboard": {
+    "title": "Dashboard chat luong dataset",
+    "subtitle": "Chi so hieu nang truoc va sau tien xu ly.",
+    "imageQuality": "Chat luong anh",
+    "pointCloudDensity": "Mat do point cloud",
+    "reconstructionAccuracy": "Do chinh xac tai dung",
+    "trackingTitle": "Theo doi tien trinh realtime",
+    "trackingSubtitle": "Giai doan xu ly va tien do tu WebSocket."
+  },
+  "projects": {
+    "title": "Tai len du an",
+    "subtitle": "Tai video de bat dau pipeline production.",
+    "uploadButton": "Tai video",
+    "uploading": "Dang tai len...",
+    "uploadProgress": "Tien do tai len",
+    "uploaded": "Da tai len. Job da xep hang",
+    "uploadFailed": "Tai len that bai"
+  },
+  "viewer": {
+    "title": "Trinh xem 3D",
+    "modelId": "Ma model"
+  }
+}

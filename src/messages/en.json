@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appName": "PreSfM",
+    "status": "Status",
+    "stage": "Stage",
+    "idle": "idle",
+    "notStarted": "not started"
+  },
+  "home": {
+    "title": "PreSfM Control Center",
+    "description": "Monitor video preprocessing, reconstruction quality, and 3D outputs in one workspace.",
+    "login": "Login",
+    "openDashboard": "Open Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "viewer": "3D Viewer"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "loginSubtitle": "Access your PreSfM workspace.",
+    "email": "Email",
+    "password": "Password",
+    "signingIn": "Signing in...",
+    "login": "Login",
+    "newUser": "New user?",
+    "registerWithOtp": "Register with OTP",
+    "registerTitle": "Register with OTP",
+    "registerSubtitle": "Create account and verify email by OTP.",
+    "otpCode": "OTP code",
+    "sendOtp": "Send OTP",
+    "resend": "Resend",
+    "creatingAccount": "Creating account...",
+    "register": "Register",
+    "alreadyHaveAccount": "Already have account?"
+  },
+  "dashboard": {
+    "title": "Dataset Quality Dashboard",
+    "subtitle": "Before vs after preprocessing performance indicators.",
+    "imageQuality": "Image Quality",
+    "pointCloudDensity": "Point Cloud Density",
+    "reconstructionAccuracy": "Reconstruction Accuracy",
+    "trackingTitle": "Real-time Job Tracking",
+    "trackingSubtitle": "Processing stage and progress from WebSocket."
+  },
+  "projects": {
+    "title": "Project Upload",
+    "subtitle": "Upload video to start production pipeline.",
+    "uploadButton": "Upload Video",
+    "uploading": "Uploading...",
+    "uploadProgress": "Upload Progress",
+    "uploaded": "Uploaded. Job queued",
+    "uploadFailed": "Upload failed"
+  },
+  "viewer": {
+    "title": "3D Viewer",
+    "modelId": "Model ID"
+  }
+}
