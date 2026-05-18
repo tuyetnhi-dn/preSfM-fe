@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, Public_Sans } from 'next/font/google';
+import { Space_Grotesk, Public_Sans, Noto_Sans, Playfair_Display } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import './globals.css';
+import { cn } from "@/lib/utils";
 
-const heading = Space_Grotesk({ subsets: ['latin'], variable: '--font-heading' });
+const notoSans = Noto_Sans({subsets:['latin'],variable:'--font-sans'});
+
+const playfairDisplayHeading = Playfair_Display({subsets:['latin'],variable:'--font-heading'});
 const body = Public_Sans({ subsets: ['latin'], variable: '--font-body' });
 
 export const metadata: Metadata = {
@@ -13,8 +16,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${heading.variable} ${body.variable} font-sans text-ink`}>
+    <html lang="en" suppressHydrationWarning className={cn("font-sans", notoSans.variable, playfairDisplayHeading.variable)}>
+      <body className={`${playfairDisplayHeading.variable} ${body.variable} font-sans text-ink`}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -2,41 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
+@layer base {
+  :root {
+    --brand: #003b73;        
+    --brand-hover: #002855;  
+    --brand-active: #001736;
+    --brand-text: #ffffff; 
+
+
+    --bg-base: #ffffff;  
+    --bg-panel: #f5f5f5;     
+    --bg-hover: #ebebeb; 
+
+    --text-base: #000000; 
+    --text-muted: #666666;
+
+    --border-base: #d1d1d1;
+    --border-hover: #999999;
+  }
+
+  .dark {
+    --brand: #004aad;        
+    --brand-hover: #003b73;  
+    --brand-active: #002855;
+    --brand-text: #ffffff;
+
+    --bg-base: #000000;
+    --bg-panel: #121212; 
+    --bg-hover: #1e1e1e;     
+
+    --text-base: #ffffff;  
+    --text-muted: #a0a0a0;
+
+    --border-base: #333333;
+    --border-hover: #555555;
+  }
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(15, 118, 110, 0.12), transparent 30%),
-    radial-gradient(circle at 92% 10%, rgba(249, 115, 22, 0.12), transparent 28%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-  color: #111827;
-}
-
-.dark body {
-  background:
-    radial-gradient(circle at 12% 18%, rgba(13, 148, 136, 0.22), transparent 30%),
-    radial-gradient(circle at 92% 10%, rgba(249, 115, 22, 0.2), transparent 28%),
-    linear-gradient(180deg, #020617 0%, #0f172a 100%);
-  color: #e2e8f0;
-}
-
-.card {
-  border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
-}
-
-.dark .card {
-  border: 1px solid rgba(51, 65, 85, 0.7);
-  background: rgba(15, 23, 42, 0.9);
-  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.55);
+@layer base {
+  body {
+    @apply bg-[var(--bg-base)] text-[var(--text-base)] antialiased;
+  }
 }

@@ -47,6 +47,8 @@
   "projects": {
     "title": "Project Upload",
     "subtitle": "Upload video to start production pipeline.",
+    "uploadInstructions": "Drag & drop or click to select video",
+    "fileSizeLimit": "MP4, MOV, AVI, MKV · Up to 2GB",
     "uploadButton": "Upload Video",
     "uploading": "Uploading...",
     "uploadProgress": "Upload Progress",

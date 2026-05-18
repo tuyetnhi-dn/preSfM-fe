@@ -10,11 +10,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: '#111827',
-        mist: '#f3f4f6',
-        ocean: '#0f766e',
-        coral: '#f97316',
-        steel: '#334155',
+      brand: {
+          DEFAULT: "var(--brand)",
+          hover: "var(--brand-hover)",
+          active: "var(--brand-active)",
+          text: "var(--brand-text)",
+        },
+        bg: {
+          base: "var(--bg-base)",
+          panel: "var(--bg-panel)",
+          hover: "var(--bg-hover)",
+        },
+        text: {
+          base: "var(--text-base)",
+          muted: "var(--text-muted)",
+        },
+        border: {
+          base: "var(--border-base)",
+          hover: "var(--border-hover)",
+        },
       },
       boxShadow: {
         soft: '0 8px 30px rgba(15, 23, 42, 0.08)',
