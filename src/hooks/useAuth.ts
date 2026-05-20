@@ -1,72 +1,83 @@
-'use client';
+// import { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import { authApiService } from "@/services/auth/auth.service";
+// import { useLocale } from "next-intl";
 
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { authService } from '@/services/auth.service';
-import { useAppStore } from '@/store/useAppStore';
-import { tokenStorage } from '@/utils/storage';
+// export function useAuth() {
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const router = useRouter();
+//   const locale = useLocale();
 
-export function useAuth() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { setAuth, clearAuth } = useAppStore();
+//   const sendOtp = async (email: string) => {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       await authApiService.sendOtp(email);
+//     } catch (err: any) {
+//       setError(
+//         err.response?.data?.message || "Không thể gửi OTP. Vui lòng thử lại.",
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  const locale = pathname.split('/').filter(Boolean)[0] || 'en';
+//   const registerWithOtp = async (
+//     email: string,
+//     password: string,
+//     otp: string,
+//   ) => {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       const data = await authApiService.registerWithOtp(email, password, otp);
 
-  const login = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await authService.login(email, password);
-      tokenStorage.setToken(result.data.accessToken);
-      setAuth({ email }, result.data.accessToken);
-      router.push(`/${locale}/dashboard`);
-    } catch (err) {
-      setError('Login failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+//       // Nếu Backend trả về token ngay sau khi đăng ký, lưu lại tại đây
+//       if (data?.accessToken) {
+//         localStorage.setItem("accessToken", data.accessToken);
+//       }
 
-  const registerWithOtp = async (email: string, password: string, otp: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await authService.verifyOtp(email, otp);
-      const result = await authService.register(email, password);
-      tokenStorage.setToken(result.data.accessToken);
-      setAuth({ email }, result.data.accessToken);
-      router.push(`/${locale}/dashboard`);
-    } catch (err) {
-      setError('Register failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+//       // Đăng ký thành công điều hướng về trang đăng nhập
+//       router.push(`/${locale}/auth/login`);
+//     } catch (err: any) {
+//       setError(
+//         err.response?.data?.message ||
+//           "Đăng ký thất bại. Vui lòng kiểm tra lại mã OTP.",
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  const sendOtp = async (email: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await authService.sendOtp(email);
-    } catch (err) {
-      setError('Send OTP failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+//   const login = async (email: string, password: string) => {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       const data = await authApiService.login(email, password);
 
-  const logout = () => {
-    tokenStorage.clearToken();
-    clearAuth();
-    router.push(`/${locale}/auth/login`);
-  };
+//       // Lưu Token vào LocalStorage phục vụ các API cần quyền truy cập phía sau
+//       if (data?.accessToken) {
+//         localStorage.setItem("accessToken", data.accessToken);
+//       }
 
-  return { loading, error, login, sendOtp, registerWithOtp, logout };
-}
+//       // Điều hướng về trang Dashboard chính của ứng dụng
+//       router.push(`/${locale}/dashboard`);
+//     } catch (err: any) {
+//       setError(
+//         err.response?.data?.message ||
+//           "Tài khoản hoặc mật khẩu không chính xác.",
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return {
+//     sendOtp,
+//     registerWithOtp,
+//     login,
+//     loading,
+//     error,
+//   };
+// }

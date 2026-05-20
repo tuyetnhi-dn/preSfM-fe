@@ -1,29 +1,30 @@
 {
-"common": {
+  "common": {
     "appName": "PreSfM",
     "status": "Trạng thái",
     "stage": "Giai đoạn",
     "idle": "Đang chờ",
     "notStarted": "Chưa bắt đầu"
-},
-"home": {
+  },
+  "home": {
     "title": "Trung tâm điều khiển PreSfM",
     "description": "Giám sát tiền xử lý video, chất lượng tái dựng và đầu ra 3D trong một workspace.",
     "login": "Đăng nhập",
     "openDashboard": "Mở Dashboard"
-},
-"nav": {
+  },
+  "nav": {
     "dashboard": "Dashboard",
     "projects": "Dự án",
     "viewer": "Trình xem 3D"
-},
-"auth": {
+  },
+  "auth": {
     "loginTitle": "Đăng nhập",
     "loginSubtitle": "Truy cập workspace PreSfM của bạn",
     "email": "Email",
     "password": "Mật khẩu",
     "signingIn": "Đang đăng nhập...",
     "login": "Đăng nhập",
+    "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập của bạn.",
     "newUser": "Người dùng mới?",
     "registerWithOtp": "Đăng ký với OTP",
     "registerTitle": "Đăng ký với OTP",
@@ -34,8 +35,8 @@
     "creatingAccount": "Đang tạo tài khoản...",
     "register": "Đăng ký",
     "alreadyHaveAccount": "Đã có tài khoản?"
-},
-"dashboard": {
+  },
+  "dashboard": {
     "title": "Dashboard chất lượng dataset",
     "subtitle": "Chỉ số hiệu năng trước và sau tiền xử lý.",
     "imageQuality": "Chất lượng ảnh",
@@ -43,8 +44,8 @@
     "reconstructionAccuracy": "Độ chính xác tái dựng",
     "trackingTitle": "Theo dõi tiến trình realtime",
     "trackingSubtitle": "Giai đoạn xử lý và tiến độ từ WebSocket."
-},
-"projects": {
+  },
+  "projects": {
     "title": "Tải lên dự án",
     "subtitle": "Tải video để bắt đầu pipeline production.",
     "uploadInstructions": "Kéo thả hoặc nhấn để chọn video",
@@ -54,9 +55,9 @@
     "uploadProgress": "Tiến độ tải lên",
     "uploaded": "Đã tải lên. Job đã được xếp hàng",
     "uploadFailed": "Tải lên thất bại"
-},
-"viewer": {
-"title": "Trình xem 3D",
-"modelId": "Mã model"
-}
+  },
+  "viewer": {
+    "title": "Trình xem 3D",
+    "modelId": "Mã model"
+  }
 }

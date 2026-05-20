@@ -24,6 +24,7 @@
     "password": "Password",
     "signingIn": "Signing in...",
     "login": "Login",
+    "loginFailed": "Login failed. Please check your credentials.",
     "newUser": "New user?",
     "registerWithOtp": "Register with OTP",
     "registerTitle": "Register with OTP",

@@ -4,3 +4,10 @@ export const viewerService = {
     return `${base}/storage/presign-download?bucket=presfm-artifacts&objectKey=${id}.ply`;
   },
 };
+// export const viewerService = {
+//   getPlyUrl(id?: string) {
+//     if (!id) return null;
+
+//     return `/api/viewer/${id}/ply`;
+//   },
+// };
