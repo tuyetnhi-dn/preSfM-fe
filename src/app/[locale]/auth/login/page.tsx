@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { useLoginMutation } from "@/services/auth/auth.service";
+import { setAuthStorage } from "@/lib/auth-storage";
+import Loader from "@/components/ui/loader";
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "data" in error) {
@@ -33,6 +35,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const searchParams = useSearchParams();
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -44,13 +47,15 @@ export default function LoginPage() {
         password,
       }).unwrap();
 
-      localStorage.setItem("accessToken", res.accessToken);
-      localStorage.setItem("refreshToken", res.refreshToken);
-      localStorage.setItem("user", JSON.stringify(res.user));
+      setAuthStorage({
+        accessToken: res.accessToken,
+        refreshToken: res.refreshToken,
+        user: res.user,
+      });
 
-      window.dispatchEvent(new Event("auth-changed"));
+      const redirect = searchParams.get("redirect");
 
-      router.push(`/${locale}/projects`);
+      router.push(redirect || `/${locale}/home`);
     } catch (error) {
       setLoginError(getErrorMessage(error));
     }
@@ -92,9 +97,9 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-xl bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
+          className="w-full rounded-xl flex items-center text-center justify-center bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
         >
-          {isLoading ? t("signingIn") : t("login")}
+          {isLoading ? <Loader /> : t("login")}
         </button>
       </form>
 

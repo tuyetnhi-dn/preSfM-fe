@@ -6,16 +6,25 @@
     "idle": "idle",
     "notStarted": "not started"
   },
+
   "home": {
-    "title": "PreSfM Control Center",
-    "description": "Monitor video preprocessing, reconstruction quality, and 3D outputs in one workspace.",
-    "login": "Login",
-    "openDashboard": "Open Dashboard"
+    "title": "Home",
+    "subtitle": "Quickly track recent video processing projects in PreSfM.",
+    "createProjectTitle": "Create new project",
+    "createProjectDescription": "Upload a video so the system can automatically create a project, dataset, and prepare data for the OpenSfM pipeline.",
+    "createProjectButton": "Create new project",
+    "recentProjects": "Recent projects",
+    "recentProjectsDescription": "Showing up to 5 of your latest projects/videos.",
+    "loadingProjects": "Loading projects...",
+    "unknownUploader": "User"
   },
+
   "nav": {
     "dashboard": "Dashboard",
     "projects": "Projects",
-    "viewer": "3D Viewer"
+    "viewer": "3D Viewer",
+    "accountInformation": "Account Information",
+    "logout": "Logout"
   },
   "auth": {
     "loginTitle": "Login",

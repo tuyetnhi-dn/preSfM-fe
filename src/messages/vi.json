@@ -7,15 +7,22 @@
     "notStarted": "Chưa bắt đầu"
   },
   "home": {
-    "title": "Trung tâm điều khiển PreSfM",
-    "description": "Giám sát tiền xử lý video, chất lượng tái dựng và đầu ra 3D trong một workspace.",
-    "login": "Đăng nhập",
-    "openDashboard": "Mở Dashboard"
+    "title": "Trang chủ",
+    "subtitle": "Theo dõi nhanh các project xử lý video gần đây trong hệ thống PreSfM.",
+    "createProjectTitle": "Tạo project mới",
+    "createProjectDescription": "Tải video lên để hệ thống tự tạo project, dataset và chuẩn bị dữ liệu cho pipeline OpenSfM.",
+    "createProjectButton": "Tạo project mới",
+    "recentProjects": "Project gần đây",
+    "recentProjectsDescription": "Hiển thị tối đa 5 project/video mới nhất của bạn.",
+    "loadingProjects": "Đang tải danh sách project...",
+    "unknownUploader": "Người dùng"
   },
   "nav": {
     "dashboard": "Dashboard",
     "projects": "Dự án",
-    "viewer": "Trình xem 3D"
+    "viewer": "Trình xem 3D",
+    "accountInformation": "Thông tin tài khoản",
+    "logout": "Đăng xuất"
   },
   "auth": {
     "loginTitle": "Đăng nhập",

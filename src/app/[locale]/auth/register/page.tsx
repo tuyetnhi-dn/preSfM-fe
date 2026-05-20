@@ -8,6 +8,7 @@ import {
   useRegisterWithOtpMutation,
   useSendOtpMutation,
 } from "@/services/auth/auth.service";
+import Loader from "@/components/ui/loader";
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "data" in error) {
@@ -138,9 +139,9 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading || !otp}
-          className="w-full rounded-xl bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
+          className="w-full flex items-center justify-center rounded-xl bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
         >
-          {isRegistering ? t("creatingAccount") : t("register")}
+          {isRegistering ? <Loader /> : t("register")}
         </button>
       </form>
 
