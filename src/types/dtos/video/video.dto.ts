@@ -14,6 +14,7 @@ export type UploadVideoBodyType = {
   file: File;
   datasetId?: string;
   uploadedBy?: string;
+  projectName?: string;
   onProgress?: (progress: number) => void;
 };
 

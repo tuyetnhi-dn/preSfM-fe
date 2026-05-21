@@ -61,7 +61,7 @@ export const videoApi = createApi({
   refetchOnReconnect: true,
   endpoints: (builder) => ({
     uploadVideo: builder.mutation<UploadVideoResType, UploadVideoBodyType>({
-      async queryFn({ file, datasetId, uploadedBy, onProgress }) {
+      async queryFn({ file, datasetId, uploadedBy, projectName, onProgress }) {
         const formData = new FormData();
 
         formData.append("file", file);
@@ -72,6 +72,9 @@ export const videoApi = createApi({
 
         if (uploadedBy) {
           formData.append("uploadedBy", uploadedBy);
+        }
+        if (projectName) {
+          formData.append("projectName", projectName);
         }
 
         try {

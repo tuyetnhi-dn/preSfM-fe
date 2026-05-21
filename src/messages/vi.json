@@ -61,7 +61,10 @@
     "uploading": "Đang tải lên...",
     "uploadProgress": "Tiến độ tải lên",
     "uploaded": "Đã tải lên. Job đã được xếp hàng",
-    "uploadFailed": "Tải lên thất bại"
+    "uploadFailed": "Tải lên thất bại",
+    "projectName": "Tên project",
+    "projectNamePlaceholder": "Nhập tên project",
+    "projectNameRequired": "Vui lòng nhập tên project."
   },
   "viewer": {
     "title": "Trình xem 3D",

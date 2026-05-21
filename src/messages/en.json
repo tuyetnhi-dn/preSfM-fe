@@ -63,7 +63,10 @@
     "uploading": "Uploading...",
     "uploadProgress": "Upload Progress",
     "uploaded": "Uploaded. Job queued",
-    "uploadFailed": "Upload failed"
+    "uploadFailed": "Upload failed",
+    "projectName": "Project Name",
+    "projectNamePlaceholder": "Enter project name",
+    "projectNameRequired": "Please enter a project name."
   },
   "viewer": {
     "title": "3D Viewer",

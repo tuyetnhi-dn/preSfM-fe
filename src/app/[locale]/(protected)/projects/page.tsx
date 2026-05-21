@@ -12,28 +12,6 @@ import { UploadProgress } from "./components/UploadProgress";
 import { getCurrentUser } from "@/lib/auth-storage";
 import Loader from "@/components/ui/loader";
 
-type StoredUser = {
-  id: string;
-  email: string;
-  fullName: string | null;
-  role: string;
-  status: string;
-};
-
-function getStoredUser(): StoredUser | null {
-  if (typeof window === "undefined") return null;
-
-  const user = localStorage.getItem("user");
-
-  if (!user) return null;
-
-  try {
-    return JSON.parse(user) as StoredUser;
-  } catch {
-    return null;
-  }
-}
-
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "data" in error) {
     const data = (error as { data?: unknown }).data;
@@ -57,6 +35,7 @@ export default function ProjectsPage() {
   const t = useTranslations("projects");
 
   const [file, setFile] = useState<File | null>(null);
+  const [projectName, setProjectName] = useState("");
   const [message, setMessage] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -73,7 +52,12 @@ export default function ProjectsPage() {
     const currentUser = getCurrentUser();
 
     if (!currentUser?.id) {
-      setMessage("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+      setMessage(t("invalidSession"));
+      return;
+    }
+
+    if (!projectName.trim()) {
+      setMessage(t("projectNameRequired"));
       return;
     }
 
@@ -81,6 +65,7 @@ export default function ProjectsPage() {
       const response = await uploadVideo({
         file,
         uploadedBy: currentUser.id,
+        projectName: projectName.trim(),
         onProgress: setUploadProgress,
       }).unwrap();
 
@@ -111,6 +96,20 @@ export default function ProjectsPage() {
       </div>
 
       <div>
+        <div className="mb-4">
+          <label className="mb-2 block text-sm font-medium text-ink dark:text-slate-100">
+            {t("projectName")}
+          </label>
+
+          <input
+            type="text"
+            value={projectName}
+            onChange={(event) => setProjectName(event.target.value)}
+            placeholder={t("projectNamePlaceholder")}
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+
         {file ? (
           <VideoPreview file={file} onRemove={() => setFile(null)} />
         ) : (
@@ -121,14 +120,14 @@ export default function ProjectsPage() {
 
         <button
           onClick={onUpload}
-          disabled={!file || isLoading}
-          className="w-full bg-brand flex items-center justify-center hover:bg-brand-dark text-white text-sm font-medium mt-4 hover:pointer rounded-lg px-4 py-2 transition"
+          disabled={!file || !projectName.trim() || isLoading}
+          className="w-full bg-brand flex items-center justify-center hover:bg-brand-dark text-white text-sm font-medium mt-4 hover:pointer rounded-lg px-4 py-2 transition disabled:opacity-60"
         >
           {isLoading ? <Loader /> : t("uploadButton")}
         </button>
 
         {message && (
-          <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <p className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400">
             {message}
           </p>
         )}
