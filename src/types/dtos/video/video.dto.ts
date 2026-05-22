@@ -67,7 +67,12 @@ export type VideoMetadataResType = {
 export type CreatePipelineBodyType = {
   pipelineType: PipelineType;
   sampleFps?: number;
-  config?: Record<string, unknown>;
+  config?: {
+    outputRawFolder?: string;
+    outputMaskFolder?: string;
+    outputProcessedFolder?: string;
+    [key: string]: unknown;
+  };
 };
 
 export type ExtractFramesBodyType = {
@@ -75,16 +80,41 @@ export type ExtractFramesBodyType = {
   body: CreatePipelineBodyType;
 };
 
-export type ExtractFramesResType = {
+export type PipelineRunDto = {
   id: string;
-  dataset_id: string;
-  video_id: string;
+  datasetId: string;
+  videoId: string;
   status: string;
   progress: number;
-  config: Record<string, unknown>;
-  pipeline_type: PipelineType;
-  created_at: string;
-  updated_at?: string;
+  pipelineType: PipelineType;
+};
+
+export type FrameStorageAssetDto = {
+  storageFileId: string;
+  bucket: string;
+  path: string;
+  url: string;
+};
+
+export type FrameImageDto = {
+  id: string;
+  frameIndex: number;
+  timestampMs: number;
+  width: number;
+  height: number;
+  raw: FrameStorageAssetDto | null;
+  processed: FrameStorageAssetDto | null;
+  mask: FrameStorageAssetDto | null;
+};
+
+export type ExtractFramesResType = {
+  pipelineRun: PipelineRunDto;
+  rawImages: FrameImageDto[];
+  processedImages: FrameImageDto[];
+  masks: FrameImageDto[];
+  totalRawImages: number;
+  totalProcessedImages: number;
+  totalMasks: number;
 };
 
 export type DeleteVideoResType = {

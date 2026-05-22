@@ -58,13 +58,41 @@
     "uploadInstructions": "Kéo thả hoặc nhấn để chọn video",
     "fileSizeLimit": "MP4, MOV, AVI, MKV · Tối đa 2GB",
     "uploadButton": "Tải video",
+    "nextStepButton": "Tiếp tục xử lý ảnh",
     "uploading": "Đang tải lên...",
     "uploadProgress": "Tiến độ tải lên",
     "uploaded": "Đã tải lên. Job đã được xếp hàng",
     "uploadFailed": "Tải lên thất bại",
     "projectName": "Tên project",
     "projectNamePlaceholder": "Nhập tên project",
-    "projectNameRequired": "Vui lòng nhập tên project."
+    "projectNameRequired": "Vui lòng nhập tên project.",
+    "pipelineFlowBoard": {
+      "title": "Luồng pipeline",
+      "stages": {
+        "uploaded": "Đã tải lên",
+        "extracting": "Đang trích xuất ảnh",
+        "processing": "Đang xử lý ảnh",
+        "ready": "Sẵn sàng xem",
+        "failed": "Xử lý thất bại"
+      },
+      "line1": {
+        "title": "Luồng 1: Ảnh gốc",
+        "description": "Bộ ảnh được cắt trực tiếp từ video, không lọc nhiễu, không tạo mask.",
+        "raw_title": "Ảnh gốc",
+        "raw_description": "Bộ ảnh được cắt trực tiếp từ video, không lọc nhiễu, không tạo mask.",
+        "raw_empty": "Không có ảnh gốc nào được tạo ra"
+      },
+      "line2": {
+        "title": "Luồng 2: Ảnh đã xử lý",
+        "description": "Raw images được đưa qua lọc nhiễu, lọc ảnh mờ và tạo mask vật thể động.",
+        "processed_title": "Ảnh đã xử lý",
+        "processed_description": "Ảnh đã qua lọc nhiễu, lọc mờ và tiền xử lý.",
+        "processed_empty": "Không có ảnh đã xử lý nào được tạo ra",
+        "mask_title": "Mask vật thể động",
+        "mask_description": "Mask tương ứng với ảnh đã xử lý",
+        "mask_empty": "Không có mask nào được tạo ra"
+      }
+    }
   },
   "viewer": {
     "title": "Trình xem 3D",

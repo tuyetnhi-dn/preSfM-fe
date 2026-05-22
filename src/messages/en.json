@@ -66,7 +66,34 @@
     "uploadFailed": "Upload failed",
     "projectName": "Project Name",
     "projectNamePlaceholder": "Enter project name",
-    "projectNameRequired": "Please enter a project name."
+    "projectNameRequired": "Please enter a project name.",
+    "nextStepButton": "Continue Image Processing",
+    "pipelineFlowBoard": {
+      "title": "Pipeline Flow",
+      "stages": {
+        "uploaded": "Uploaded",
+        "extracting": "Extracting images",
+        "processing": "Processing images",
+        "ready": "Ready to view"
+      },
+      "line1": {
+        "title": "Line 1: Raw images",
+        "description": "Images directly cut from video, no , no mask.",
+        "raw_title": "Raw images",
+        "raw_description": "Images directly cut from video, no denoising, no mask.",
+        "raw_empty": "No raw images available"
+      },
+      "line2": {
+        "title": "Line 2: Processed images",
+        "description": "Raw images go through denoising, blur filtering and dynamic object mask generation.",
+        "processed_title": "Processed images",
+        "processed_description": "Images after denoising, blur filtering and preprocessing.",
+        "processed_empty": "No processed images yet.",
+        "mask_title": "Masks",
+        "mask_description": "Masks corresponding to processed images.",
+        "mask_empty": "No masks yet."
+      }
+    }
   },
   "viewer": {
     "title": "3D Viewer",
