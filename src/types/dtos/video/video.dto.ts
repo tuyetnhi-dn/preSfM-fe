@@ -80,13 +80,28 @@ export type ExtractFramesBodyType = {
   body: CreatePipelineBodyType;
 };
 
+export type PipelineStatusDto =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | string;
+
 export type PipelineRunDto = {
   id: string;
   datasetId: string;
   videoId: string;
-  status: string;
+  status: PipelineStatusDto;
   progress: number;
-  pipelineType: PipelineType;
+  config?: Record<string, unknown>;
+  errorMessage?: string | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  pipelineType?: "raw" | "processed" | string;
+  stage?: string;
 };
 
 export type FrameStorageAssetDto = {
@@ -120,4 +135,71 @@ export type ExtractFramesResType = {
 export type DeleteVideoResType = {
   success: boolean;
   deletedVideoId: string;
+};
+
+export type StorageAssetDto = {
+  storageFileId: string;
+  bucket: string | null;
+  path: string | null;
+  url: string;
+};
+
+export type ImageAssetItem = {
+  id: string;
+  frameIndex: number;
+  timestampMs: number | null;
+  width: number | null;
+  height: number | null;
+  blurScore: number | null;
+  noiseScore: number | null;
+  isSelected: boolean;
+  rejectedReason: string | null;
+  raw?: StorageAssetDto | null;
+  processed?: StorageAssetDto | null;
+  mask?: StorageAssetDto | null;
+};
+
+export type VideoAssetsResponse = {
+  videoId: string;
+  folders?: {
+    rawImages: ImageAssetItem[];
+    processedImages: ImageAssetItem[];
+    masks: ImageAssetItem[];
+  };
+  rawImages: ImageAssetItem[];
+  processedImages: ImageAssetItem[];
+  masks: ImageAssetItem[];
+  totalRawImages: number;
+  totalProcessedImages: number;
+  totalMasks: number;
+};
+
+export type PreprocessAndGenerateMasksBody = {
+  pipelineRunId?: string;
+  config?: {
+    blurThreshold?: number;
+    noiseThreshold?: number;
+    outputProcessedFolder?: string;
+    outputMaskFolder?: string;
+  };
+};
+
+export type ExtractFramesResponse = VideoAssetsResponse & {
+  pipelineRun: PipelineRunDto;
+};
+export type PreprocessAndGenerateMasksResponse = VideoAssetsResponse & {
+  pipelineRun: PipelineRunDto;
+  total: number;
+  selectedCount: number;
+  rejectedCount: number;
+  images: Array<{
+    frameId: string;
+    frameIndex: number;
+    blurScore: number | null;
+    noiseScore: number | null;
+    isSelected: boolean;
+    rejectedReason: string | null;
+    processedStorageFileId: string | null;
+    maskStorageFileId: string | null;
+  }>;
 };

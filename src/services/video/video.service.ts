@@ -6,9 +6,13 @@ import { HttpMethod } from "@/constants/http.enum";
 import {
   DeleteVideoResType,
   ExtractFramesBodyType,
+  ExtractFramesResponse,
   ExtractFramesResType,
+  PreprocessAndGenerateMasksBody,
+  PreprocessAndGenerateMasksResponse,
   UploadVideoBodyType,
   UploadVideoResType,
+  VideoAssetsResponse,
   VideoItemType,
   VideoMetadataResType,
 } from "@/types/dtos/video/video.dto";
@@ -132,23 +136,58 @@ export const videoApi = createApi({
       }),
     }),
 
-    extractFrames: builder.mutation<
-      ExtractFramesResType,
-      ExtractFramesBodyType
-    >({
-      query: ({ id, body }) => ({
-        url: `/videos/${id}/extract-frames`,
-        method: HttpMethod.POST,
-        body,
-      }),
-    }),
-
     deleteVideo: builder.mutation<DeleteVideoResType, string>({
       query: (id) => ({
         url: `/videos/${id}`,
         method: HttpMethod.DELETE,
       }),
       invalidatesTags: ["Videos"],
+    }),
+    extractFrames: builder.mutation<
+      ExtractFramesResponse,
+      {
+        id: string;
+        body: {
+          pipelineType: "raw" | "processed";
+          sampleFps?: number;
+          config?: {
+            outputRawFolder?: string;
+            outputProcessedFolder?: string;
+            outputMaskFolder?: string;
+          };
+        };
+      }
+    >({
+      query: ({ id, body }) => ({
+        url: `/videos/${id}/extract-frames`,
+        method: "POST",
+        body,
+      }),
+    }),
+
+    preprocessAndGenerateMasks: builder.mutation<
+      PreprocessAndGenerateMasksResponse,
+      {
+        videoId: string;
+        body?: PreprocessAndGenerateMasksBody;
+      }
+    >({
+      query: ({ videoId, body }) => ({
+        url: `/videos/${videoId}/preprocess-and-generate-masks`,
+        method: "POST",
+        body: body ?? {
+          config: {
+            blurThreshold: 100,
+            noiseThreshold: 25,
+            outputProcessedFolder: "processed_images",
+            outputMaskFolder: "masks",
+          },
+        },
+      }),
+    }),
+
+    getVideoAssets: builder.query<VideoAssetsResponse, string>({
+      query: (videoId) => `/videos/${videoId}/assets`,
     }),
   }),
 });
@@ -160,4 +199,6 @@ export const {
   useGetVideoMetadataQuery,
   useExtractFramesMutation,
   useDeleteVideoMutation,
+  usePreprocessAndGenerateMasksMutation,
+  useGetVideoAssetsQuery,
 } = videoApi;
