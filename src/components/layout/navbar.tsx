@@ -20,9 +20,10 @@ export function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const navItems = [
+    { href: `/${locale}/home`, label: t("home") },
     { href: `/${locale}/projects`, label: t("projects") },
-    { href: `/${locale}/viewer`, label: t("viewer") },
-    { href: `/${locale}/dashboard`, label: t("dashboard") },
+    // { href: `/${locale}/viewer`, label: t("viewer") },
+    // { href: `/${locale}/dashboard`, label: t("dashboard") },
   ];
 
   useEffect(() => {

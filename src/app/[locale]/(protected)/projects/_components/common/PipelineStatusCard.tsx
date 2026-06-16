@@ -3,7 +3,7 @@
 import { Layers } from "lucide-react";
 
 import { UploadProgress } from "./UploadProgress";
-import type { ProcessingStage } from "./types";
+import type { ProcessingStage } from "../types";
 
 type PipelineStatusCardProps = {
   processingStage: ProcessingStage;

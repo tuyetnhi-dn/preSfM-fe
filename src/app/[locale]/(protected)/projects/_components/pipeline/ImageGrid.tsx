@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download, ImageIcon, Loader2, X } from "lucide-react";
 
-import type { ImageAsset } from "./types";
+import type { ImageAsset } from "../types";
 
 type ImageGridProps = {
   title: string;

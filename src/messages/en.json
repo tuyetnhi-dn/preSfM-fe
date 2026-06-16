@@ -23,6 +23,7 @@
     "dashboard": "Dashboard",
     "projects": "Projects",
     "viewer": "3D Viewer",
+    "home": "Home",
     "accountInformation": "Account Information",
     "logout": "Logout"
   },

@@ -4,11 +4,11 @@ import { WandSparkles } from "lucide-react";
 
 import Loader from "@/components/ui/loader";
 
-import { ProjectNameField } from "./ProjectNameField";
+import { ProjectNameField } from "../pipeline/ProjectNameField";
 import { VideoPreview } from "./VideoPreview";
 import { VideoDropZone } from "./VideoDropZone";
-import { UploadProgress } from "./UploadProgress";
-import type { ProcessingStage, UploadedVideoState } from "./types";
+import { UploadProgress } from "../common/UploadProgress";
+import type { ProcessingStage, UploadedVideoState } from "../types";
 
 type ProjectUploadPanelProps = {
   title: string;

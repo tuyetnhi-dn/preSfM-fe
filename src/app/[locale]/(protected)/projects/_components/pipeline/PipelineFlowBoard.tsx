@@ -2,10 +2,10 @@
 
 import { CheckCircle2 } from "lucide-react";
 
-import { FlowIntroCard } from "./FlowIntroCard";
+import { FlowIntroCard } from "../intro/FlowIntroCard";
 import { ImageGrid } from "./ImageGrid";
-import { PipelineStatusCard } from "./PipelineStatusCard";
-import type { ImageAsset, ProcessingStage, UploadedVideoState } from "./types";
+import { PipelineStatusCard } from "../common/PipelineStatusCard";
+import type { ImageAsset, ProcessingStage, UploadedVideoState } from "../types";
 import { useTranslations } from "next-intl";
 
 type PipelineFlowBoardProps = {

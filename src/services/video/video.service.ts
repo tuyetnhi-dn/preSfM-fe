@@ -17,6 +17,10 @@ import {
   VideoMetadataResType,
 } from "@/types/dtos/video/video.dto";
 import { backendBaseQuery } from "@/redux/services/client";
+import {
+  RunOpenSfMComparisonBody,
+  RunOpenSfMComparisonResponse,
+} from "@/types/dtos/video/opensfm.dto";
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -189,6 +193,22 @@ export const videoApi = createApi({
     getVideoAssets: builder.query<VideoAssetsResponse, string>({
       query: (videoId) => `/videos/${videoId}/assets`,
     }),
+
+    runOpenSfMComparison: builder.mutation<
+      RunOpenSfMComparisonResponse,
+      {
+        videoId: string;
+        body?: RunOpenSfMComparisonBody;
+      }
+    >({
+      query: ({ videoId, body }) => ({
+        url: `/videos/${videoId}/run-opensfm-comparison`,
+        method: "POST",
+        body: body ?? {
+          runDense: true,
+        },
+      }),
+    }),
   }),
 });
 
@@ -201,4 +221,5 @@ export const {
   useDeleteVideoMutation,
   usePreprocessAndGenerateMasksMutation,
   useGetVideoAssetsQuery,
+  useRunOpenSfMComparisonMutation,
 } = videoApi;

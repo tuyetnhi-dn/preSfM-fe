@@ -9,6 +9,7 @@ import {
   useExtractFramesMutation,
   useGetVideoAssetsQuery,
   usePreprocessAndGenerateMasksMutation,
+  useRunOpenSfMComparisonMutation,
   useUploadVideoMutation,
 } from "@/services/video/video.service";
 import type {
@@ -22,14 +23,17 @@ import {
   ProcessingStage,
   UploadedVideoState,
 } from "./_components/types";
-import { PipelineFlowBoard } from "./_components/PipelineFlowBoard";
-import { ProjectUploadPanel } from "./_components/ProjectUploadPanel";
+
 import {
   getErrorMessage,
   mapMaskFramesToImages,
   mapProcessedFramesToImages,
   mapRawFramesToImages,
 } from "./_components/utils";
+import { ProjectUploadPanel } from "./_components/upload/ProjectUploadPanel";
+import { PipelineFlowBoard } from "./_components/pipeline/PipelineFlowBoard";
+import { PointCloudViewer } from "@/components/viewer/point-cloud-viewer";
+import { RunOpenSfMComparisonResponse } from "@/types/dtos/video/opensfm.dto";
 
 type UiJobStatus = "queued" | "processing" | "completed" | "failed";
 
@@ -60,6 +64,45 @@ function normalizeFrameItems(items?: ImageAssetItem[] | null) {
   }));
 }
 
+function getStorageFileUrl(
+  file?: {
+    id?: string;
+    storageFileId?: string;
+    url?: string;
+  } | null,
+) {
+  if (!file) return "";
+
+  if (file.url) return file.url;
+
+  const id = file.id ?? file.storageFileId;
+
+  if (!id) return "";
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
+
+  return `${baseUrl}/storage/files/${encodeURIComponent(id)}/download`;
+}
+
+function formatNumber(value: number | null | undefined) {
+  if (value === null || value === undefined) return "-";
+
+  return new Intl.NumberFormat("vi-VN").format(value);
+}
+
+function formatPercent(value: number | null | undefined) {
+  if (value === null || value === undefined) return "-";
+
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+function formatError(value: number | null | undefined) {
+  if (value === null || value === undefined) return "-";
+
+  return value.toFixed(4);
+}
+
 export default function ProjectsPage() {
   const t = useTranslations("projects");
   const setJobStatus = useAppStore((state) => state.setJobStatus);
@@ -81,6 +124,8 @@ export default function ProjectsPage() {
   const [rawImages, setRawImages] = useState<ImageAsset[]>([]);
   const [processedImages, setProcessedImages] = useState<ImageAsset[]>([]);
   const [maskImages, setMaskImages] = useState<ImageAsset[]>([]);
+  const [opensfmResult, setOpensfmResult] =
+    useState<RunOpenSfMComparisonResponse | null>(null);
 
   const [uploadVideo, { isLoading: isUploading }] = useUploadVideoMutation();
 
@@ -89,6 +134,8 @@ export default function ProjectsPage() {
 
   const [preprocessAndGenerateMasks, { isLoading: isPreprocessing }] =
     usePreprocessAndGenerateMasksMutation();
+  const [runOpenSfMComparison, { isLoading: isRunningOpenSfM }] =
+    useRunOpenSfMComparisonMutation();
 
   const { refetch: refetchAssets, isFetching: isFetchingAssets } =
     useGetVideoAssetsQuery(uploadedVideo?.id ?? "", {
@@ -104,6 +151,7 @@ export default function ProjectsPage() {
     setRawImages([]);
     setProcessedImages([]);
     setMaskImages([]);
+    setOpensfmResult(null);
   };
 
   const applyAssetsToState = (data: VideoAssetsResponse) => {
@@ -295,6 +343,51 @@ export default function ProjectsPage() {
       setProcessingStage("failed");
     }
   };
+  const onRunOpenSfMComparison = async () => {
+    if (!uploadedVideo?.id) return;
+
+    if (rawImages.length === 0) {
+      setMessage("Cần cắt frame trước khi chạy OpenSfM.");
+      return;
+    }
+
+    if (processedImages.length === 0 || maskImages.length === 0) {
+      setMessage("Cần xử lý ảnh và tạo mask trước khi chạy OpenSfM.");
+      return;
+    }
+
+    if (processedImages.length !== maskImages.length) {
+      setMessage("Số lượng processed images và masks phải bằng nhau.");
+      return;
+    }
+
+    setMessage("Đang chạy OpenSfM comparison...");
+
+    try {
+      const response = await runOpenSfMComparison({
+        videoId: uploadedVideo.id,
+        body: {
+          ...(pipelineRunId ? { pipelineRunId } : {}),
+          runDense: true,
+        },
+      }).unwrap();
+
+      setOpensfmResult(response);
+      setMessage("Chạy OpenSfM comparison hoàn tất.");
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      setMessage(errorMessage || "Không thể chạy OpenSfM comparison.");
+    }
+  };
+
+  const canRunOpenSfM =
+    Boolean(uploadedVideo?.id) &&
+    rawImages.length > 0 &&
+    processedImages.length > 0 &&
+    processedImages.length === maskImages.length;
+
+  const rawPlyUrl = getStorageFileUrl(opensfmResult?.rawFlow.ply);
+  const processedPlyUrl = getStorageFileUrl(opensfmResult?.processedFlow.ply);
 
   return (
     <section className="mx-auto max-w-6xl card p-6 sm:p-8">
@@ -359,6 +452,231 @@ export default function ProjectsPage() {
         processedImages={processedImages}
         maskImages={maskImages}
       />
+      {uploadedVideo?.id && (
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
+                So sánh OpenSfM
+              </h3>
+
+              <p className="mt-1 text-xs text-steel dark:text-slate-400">
+                Raw flow dùng raw images + mask rỗng. Processed flow dùng
+                processed images + mask thật tương ứng.
+              </p>
+
+              <p className="mt-2 text-xs text-steel dark:text-slate-400">
+                Raw: {rawImages.length} | Processed: {processedImages.length} |
+                Masks: {maskImages.length}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onRunOpenSfMComparison}
+              disabled={!canRunOpenSfM || isRunningOpenSfM}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isRunningOpenSfM
+                ? "Đang chạy OpenSfM..."
+                : "Chạy so sánh OpenSfM"}
+            </button>
+          </div>
+
+          {!canRunOpenSfM ? (
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              Cần có raw images, processed images và số lượng processed images
+              phải bằng số lượng masks.
+            </div>
+          ) : null}
+        </div>
+      )}
+      {opensfmResult ? (
+        <div className="mt-6 space-y-6">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
+                    file1_raw.ply
+                  </h3>
+                  <p className="mt-1 text-xs text-steel dark:text-slate-400">
+                    Raw images + mask rỗng
+                  </p>
+                </div>
+
+                {rawPlyUrl ? (
+                  <a
+                    href={rawPlyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-ink hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
+                  >
+                    Tải PLY
+                  </a>
+                ) : null}
+              </div>
+
+              {rawPlyUrl ? (
+                <div className="h-[420px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                  <PointCloudViewer plyUrl={rawPlyUrl} />
+                </div>
+              ) : (
+                <p className="text-sm text-steel dark:text-slate-400">
+                  Không có file PLY raw.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
+                    file2_processed.ply
+                  </h3>
+                  <p className="mt-1 text-xs text-steel dark:text-slate-400">
+                    Processed images + mask thật
+                  </p>
+                </div>
+
+                {processedPlyUrl ? (
+                  <a
+                    href={processedPlyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-ink hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
+                  >
+                    Tải PLY
+                  </a>
+                ) : null}
+              </div>
+
+              {processedPlyUrl ? (
+                <div className="h-[420px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                  <PointCloudViewer plyUrl={processedPlyUrl} />
+                </div>
+              ) : (
+                <p className="text-sm text-steel dark:text-slate-400">
+                  Không có file PLY processed.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+            <div className="border-b border-slate-200 p-4 dark:border-slate-700">
+              <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
+                Kết quả đánh giá chất lượng
+              </h3>
+
+              <p className="mt-1 text-xs text-steel dark:text-slate-400">
+                Compare run: {opensfmResult.compareRunId}
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-left text-xs uppercase text-steel dark:bg-slate-800 dark:text-slate-400">
+                  <tr>
+                    <th className="px-4 py-3">Tiêu chí</th>
+                    <th className="px-4 py-3">Raw flow</th>
+                    <th className="px-4 py-3">Processed flow</th>
+                    <th className="px-4 py-3">Chênh lệch</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-ink dark:text-slate-100">
+                      Ảnh tái dựng
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.rawFlow.metrics.reconstructedImages,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.processedFlow.metrics.reconstructedImages,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-ink dark:text-slate-100">
+                      {formatNumber(
+                        opensfmResult.comparison.reconstructedImageGain,
+                      )}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-ink dark:text-slate-100">
+                      Sparse points
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.rawFlow.metrics.sparsePointCount,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.processedFlow.metrics.sparsePointCount,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-ink dark:text-slate-100">
+                      {formatPercent(
+                        opensfmResult.comparison.sparsePointGainPercent,
+                      )}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-ink dark:text-slate-100">
+                      Dense points
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.rawFlow.metrics.densePointCount,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatNumber(
+                        opensfmResult.processedFlow.metrics.densePointCount,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-ink dark:text-slate-100">
+                      {formatPercent(
+                        opensfmResult.comparison.densePointGainPercent,
+                      )}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-ink dark:text-slate-100">
+                      Reprojection error
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatError(
+                        opensfmResult.rawFlow.metrics.avgReprojectionError,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-steel dark:text-slate-300">
+                      {formatError(
+                        opensfmResult.processedFlow.metrics
+                          .avgReprojectionError,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-ink dark:text-slate-100">
+                      {formatPercent(
+                        opensfmResult.comparison
+                          .reprojectionErrorImprovementPercent,
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
