@@ -21,6 +21,11 @@ export type ProjectListItemDto = {
   videoId?: string | null;
   coverImageUrl: string | null;
 
+  videoUrl: string | null;
+  videoOriginalName: string | null;
+  videoMimeType: string | null;
+  videoSizeBytes: number | null;
+
   createdAt: string;
   updatedAt: string;
   latestPipeline: LatestPipelineDto;

@@ -86,32 +86,27 @@ export const projectApi = createApi({
       ],
     }),
     updateProjectVisibility: builder.mutation<
-      { success: boolean },
+      {
+        success: boolean;
+        project?: {
+          id: string;
+          visibility: "public" | "private";
+          updatedAt: string;
+        };
+      },
       {
         id: string;
-        userId?: string;
+        userId: string;
         visibility: "public" | "private";
       }
     >({
-      query: ({ id, userId, visibility }) => {
-        const params = new URLSearchParams();
-
-        if (userId) {
-          params.set("userId", userId);
-        }
-
-        const suffix = params.toString();
-
-        return {
-          url: `/projects/${id}/visibility${suffix ? `?${suffix}` : ""}`,
-          method: "PATCH",
-          body: { visibility },
-        };
-      },
-      invalidatesTags: (_result, _error, arg) => [
-        { type: "Project", id: arg.id },
-        "Project",
-      ],
+      query: ({ id, userId, visibility }) => ({
+        url: `/projects/${id}/visibility?userId=${encodeURIComponent(userId)}`,
+        method: "PATCH",
+        body: {
+          visibility,
+        },
+      }),
     }),
   }),
 });

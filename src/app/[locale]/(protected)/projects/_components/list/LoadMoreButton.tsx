@@ -1,3 +1,6 @@
+import Loader from "@/components/ui/loader";
+import { ArrowDown, LoaderIcon, MoveDownIcon } from "lucide-react";
+
 type Props = {
   hasNextPage?: boolean;
   isFetching?: boolean;
@@ -17,7 +20,7 @@ export function LoadMoreButton({ hasNextPage, isFetching, onClick }: Props) {
         onClick={onClick}
         className="rounded-xl border px-4 py-2 text-sm"
       >
-        {isFetching ? "Đang tải..." : "Xem thêm"}
+        {isFetching ? <LoaderIcon className="animate-spin" /> : <ArrowDown />}
       </button>
     </div>
   );

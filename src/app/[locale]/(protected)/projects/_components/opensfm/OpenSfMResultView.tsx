@@ -1,5 +1,6 @@
 import { PointCloudViewer } from "@/components/viewer/point-cloud-viewer";
 import { OpenSfMMetricsTable } from "./OpenSfMMetricsTable";
+import { useTranslations } from "next-intl";
 
 type Props = {
   result: any;
@@ -22,15 +23,16 @@ export function OpenSfMResultView({ result }: Props) {
   const rawMetrics = result?.rawFlow?.metrics;
   const processedMetrics = result?.processedFlow?.metrics;
   const comparisonMetrics = result?.comparison;
+  const t = useTranslations("projects.opensfmResultView");
 
   return (
     <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
       <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
-        Kết quả so sánh OpenSfM
+        {t("title")}
       </h3>
 
       <p className="mt-1 text-xs text-steel dark:text-slate-400">
-        So sánh kết quả tái dựng giữa luồng ảnh gốc và luồng ảnh đã tiền xử lý.
+        {t("description")}
       </p>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -38,7 +40,7 @@ export function OpenSfMResultView({ result }: Props) {
           <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
             <div className="mb-3 flex items-center justify-between gap-3">
               <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
-                Raw Flow Point Cloud
+                {t("rawFlowTitle")}
               </h4>
 
               <a
@@ -47,7 +49,7 @@ export function OpenSfMResultView({ result }: Props) {
                 rel="noreferrer"
                 className="text-xs font-medium text-blue-600 hover:underline"
               >
-                Tải PLY
+                {t("downloadPLY")}
               </a>
             </div>
 
@@ -59,7 +61,7 @@ export function OpenSfMResultView({ result }: Props) {
           <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
             <div className="mb-3 flex items-center justify-between gap-3">
               <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
-                Processed Flow Point Cloud
+                {t("processedFlowTitle")}
               </h4>
 
               <a
@@ -68,7 +70,7 @@ export function OpenSfMResultView({ result }: Props) {
                 rel="noreferrer"
                 className="text-xs font-medium text-blue-600 hover:underline"
               >
-                Tải PLY
+                {t("downloadPLY")}
               </a>
             </div>
 

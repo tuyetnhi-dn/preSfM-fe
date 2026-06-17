@@ -69,6 +69,10 @@
     "projectNamePlaceholder": "Enter project name",
     "projectNameRequired": "Please enter a project name.",
     "nextStepButton": "Continue Image Processing",
+    "emptyMyProjects": "You don't have any projects yet. Create a new project to get started.",
+    "createProjectButton": "Create project",
+    "listTitle": "Project List",
+    "listDescription": "Projects you have created and are processing. Click on a project to see details and processing progress.",
     "pipelineFlowBoard": {
       "title": "Pipeline Flow",
       "stages": {
@@ -94,6 +98,102 @@
         "mask_description": "Masks corresponding to processed images.",
         "mask_empty": "No masks yet."
       }
+    },
+    "opensfmResultView": {
+      "title": "OpenSfM reconstruction result comparison",
+      "description": "Compare reconstruction results between raw image flow and processed image flow.",
+      "rawFlowTitle": "Raw Flow Point Cloud",
+      "processedFlowTitle": "Processed Flow Point Cloud",
+      "downloadPLY": "Download PLY"
+    },
+    "create": {
+      "title": "Create new project",
+      "subtitle": "Upload a video, add metadata, and start the background processing pipeline.",
+
+      "projectName": "Project name",
+      "projectNamePlaceholder": "Example: 3D reconstruction of a campus scene",
+
+      "description": "Project description",
+      "descriptionPlaceholder": "Example: A street-scene reconstruction test video captured by phone...",
+
+      "datasetName": "Dataset name",
+      "datasetNamePlaceholder": "Leave empty to use the project name",
+
+      "visibility": "Visibility",
+
+      "videoRequired": "Please select a video.",
+      "projectNameRequired": "Please enter a project name.",
+      "invalidSession": "Invalid session. Please sign in again.",
+      "uploadFailed": "Could not create the project or start the pipeline.",
+
+      "submitButton": "Create project and run pipeline",
+      "processingButton": "Processing...",
+
+      "pipelineStarted": "The pipeline has started in the background."
+    }
+  },
+  "projectDetail": {
+    "loadingProject": "Loading project...",
+    "eyebrow": "Project detail",
+    "untitledProject": "Untitled project",
+    "noDescription": "No description",
+    "noVideo": "This project has no video",
+    "refresh": "Refresh",
+
+    "pipelineStatus": "Pipeline status",
+    "progress": "Progress",
+    "visibility": "Visibility",
+    "visibilityPrivate": "Private",
+    "visibilityPublic": "Public",
+    "mode": "Mode",
+    "stage": "Stage",
+
+    "runningTitle": "Pipeline is running",
+    "runningDescription": "Current stage: {stage}. You can leave this page while the system continues processing in the background.",
+
+    "loadingAssets": "Loading images, masks, and results...",
+    "completedWithoutResult": "The pipeline has completed, but comparison data is not available yet.",
+    "failedTitle": "Pipeline failed",
+    "failedDescription": "Something went wrong during processing. Please check backend logs.",
+    "reloadStatus": "Reload status",
+    "cancelledDescription": "The pipeline was cancelled.",
+    "noPipeline": "This project does not have any pipeline run yet.",
+
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    },
+
+    "metrics": {
+      "reconstructedImages": "Reconstructed images",
+      "sparsePoints": "Sparse points",
+      "densePoints": "Dense points",
+      "reprojectionError": "Reprojection error",
+      "gain": "Gain",
+      "improvement": "Improvement"
+    },
+    "opensfmMetrics": {
+      "title": "OpenSfM result comparison",
+      "description": "Compare reconstruction quality between Raw Flow and Processed Flow.",
+      "criterion": "Metric",
+      "rawFlow": "Raw Flow",
+      "processedFlow": "Processed Flow",
+      "difference": "Difference",
+      "reconstructedImages": "Reconstructed images",
+      "sparsePoints": "Sparse points",
+      "densePoints": "Dense points",
+      "reprojectionError": "Reprojection error"
+    },
+
+    "toast": {
+      "visibilityPublic": "Project is now public.",
+      "visibilityPrivate": "Project is now private.",
+      "visibilityFailed": "Could not update project visibility."
     }
   },
   "viewer": {

@@ -35,25 +35,10 @@ export function PipelineFlowBoard({
           <h2 className="text-lg font-semibold text-ink dark:text-slate-100">
             {t("title")}
           </h2>
-
-          <p className="mt-1 text-sm text-steel dark:text-slate-300">
-            Video: {uploadedVideo.originalName}
-          </p>
-
-          {pipelineRunId ? (
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Pipeline ID: {pipelineRunId}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
-          <CheckCircle2 className="h-4 w-4" />
-          {processingStage}
         </div>
       </div>
 
-      <PipelineStatusCard processingStage={processingStage} />
+      {/* <PipelineStatusCard processingStage={processingStage} /> */}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">

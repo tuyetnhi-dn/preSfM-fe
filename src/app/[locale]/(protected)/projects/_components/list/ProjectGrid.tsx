@@ -3,7 +3,7 @@ import { ProjectCard } from "./ProjectCard";
 
 type Props = {
   projects: ProjectListItemDto[];
-  emptyText?: string;
+  emptyText?: string | React.ReactNode;
 };
 
 export function ProjectGrid({ projects, emptyText }: Props) {

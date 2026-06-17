@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
+import {
+  CheckCircle2,
+  Clock3,
+  Eye,
+  EyeOff,
+  Loader2,
+  LoaderIcon,
+  RefreshCcw,
+  XCircle,
+} from "lucide-react";
 
 import {
   useGetLatestProjectPipelineQuery,
@@ -9,6 +21,9 @@ import {
   useGetProjectByIdQuery,
   useUpdateProjectVisibilityMutation,
 } from "@/services/project/project.service";
+
+import Loader from "@/components/ui/loader";
+import { getCurrentUser } from "@/lib/auth-storage";
 
 import { PipelineFlowBoard } from "../_components/pipeline/PipelineFlowBoard";
 import { OpenSfMResultView } from "../_components/opensfm/OpenSfMResultView";
@@ -20,35 +35,87 @@ import {
 } from "../_utils/project-assets.mapper";
 
 import type { UploadedVideoState } from "../_components/types";
-import { getCurrentUser } from "@/lib/auth-storage";
-import { Select } from "radix-ui";
-import toast from "react-hot-toast";
+import { VideoPreview } from "../_components/upload/VideoPreview";
+
+type PipelineStatus =
+  | "pending"
+  | "running"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+function isActivePipeline(status?: string | null) {
+  return (
+    status === "pending" || status === "running" || status === "processing"
+  );
+}
+
+function isFinalPipeline(status?: string | null) {
+  return (
+    status === "completed" || status === "failed" || status === "cancelled"
+  );
+}
+
+function StatusIcon({ status }: { status?: string | null }) {
+  if (status === "completed") {
+    return <CheckCircle2 className="h-4 w-4 text-[var(--brand)]" />;
+  }
+
+  if (status === "failed") {
+    return <XCircle className="h-4 w-4 text-red-500" />;
+  }
+
+  if (status === "cancelled") {
+    return <XCircle className="h-4 w-4 text-[var(--text-muted)]" />;
+  }
+
+  if (isActivePipeline(status)) {
+    return <Loader2 className="h-4 w-4 animate-spin text-[var(--brand)]" />;
+  }
+
+  return <Clock3 className="h-4 w-4 text-[var(--text-muted)]" />;
+}
+
+function formatNumber(value?: number | null) {
+  if (value === null || value === undefined) return "--";
+
+  return new Intl.NumberFormat("vi-VN").format(value);
+}
+
+function formatPercent(value?: number | null) {
+  if (value === null || value === undefined) return "--";
+
+  return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
 
 export default function ProjectDetailPage() {
+  const t = useTranslations("projectDetail");
   const params = useParams();
   const projectId = params.id as string;
 
-  const [pipelinePollingInterval, setPipelinePollingInterval] = useState(5000);
-  const [lastFetchedStage, setLastFetchedStage] = useState("");
-
   const currentUser = getCurrentUser();
 
-  const { data: project, isLoading: isLoadingProject } = useGetProjectByIdQuery(
-    {
-      id: projectId,
-      userId: currentUser?.id,
-    },
-  );
+  const {
+    data: project,
+    isLoading: isLoadingProject,
+    refetch: refetchProject,
+  } = useGetProjectByIdQuery({
+    id: projectId,
+    userId: currentUser?.id,
+  });
 
   const {
     data: latestPipeline,
     isLoading: isLoadingPipeline,
     refetch: refetchLatestPipeline,
   } = useGetLatestProjectPipelineQuery(projectId, {
-    pollingInterval: pipelinePollingInterval,
+    pollingInterval: isActivePipeline(undefined) ? 5000 : 0,
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
+
+  const shouldPollPipeline = isActivePipeline(latestPipeline?.status);
 
   const {
     data: assets,
@@ -58,28 +125,31 @@ export default function ProjectDetailPage() {
     skip: !projectId,
   });
 
-  useEffect(() => {
-    if (!latestPipeline) return;
-
-    const isFinished =
-      latestPipeline.status === "completed" ||
-      latestPipeline.status === "failed" ||
-      latestPipeline.status === "cancelled";
-
-    if (isFinished) {
-      setPipelinePollingInterval(0);
-    }
-  }, [latestPipeline]);
+  const [updateVisibility, { isLoading: isUpdatingVisibility }] =
+    useUpdateProjectVisibilityMutation();
 
   useEffect(() => {
-    const currentStage = latestPipeline?.currentStage;
+    if (!shouldPollPipeline) return;
 
-    if (!currentStage) return;
-    if (currentStage === lastFetchedStage) return;
+    const timer = window.setInterval(() => {
+      refetchLatestPipeline();
+    }, 5000);
 
-    setLastFetchedStage(currentStage);
+    return () => window.clearInterval(timer);
+  }, [shouldPollPipeline, refetchLatestPipeline]);
+
+  useEffect(() => {
+    if (!latestPipeline?.currentStage) return;
+    if (isFinalPipeline(latestPipeline.status)) return;
+
     refetchAssets();
-  }, [latestPipeline?.currentStage, lastFetchedStage, refetchAssets]);
+  }, [latestPipeline?.currentStage, latestPipeline?.status, refetchAssets]);
+
+  useEffect(() => {
+    if (latestPipeline?.status === "completed") {
+      refetchAssets();
+    }
+  }, [latestPipeline?.status, refetchAssets]);
 
   const rawImages = useMemo(() => {
     if (!assets) return [];
@@ -112,37 +182,7 @@ export default function ProjectDetailPage() {
       }
     : null;
 
-  const isRunning =
-    latestPipeline?.status === "pending" ||
-    latestPipeline?.status === "running" ||
-    latestPipeline?.status === "processing";
-
-  const [updateVisibility, { isLoading: isUpdatingVisibility }] =
-    useUpdateProjectVisibilityMutation();
-
-  const handleChangeVisibility = async (value: "public" | "private") => {
-    if (!project?.id) return;
-
-    try {
-      await updateVisibility({
-        id: project.id,
-        userId: currentUser?.id,
-        visibility: value,
-      }).unwrap();
-
-      toast.success(
-        value === "public"
-          ? "Project đã chuyển sang Public."
-          : "Project đã chuyển sang Private.",
-      );
-    } catch (error) {
-      toast.error("Không thể cập nhật chế độ hiển thị.");
-    }
-  };
-
-  const isCompleted = latestPipeline?.status === "completed";
-  const isFailed = latestPipeline?.status === "failed";
-  const isCancelled = latestPipeline?.status === "cancelled";
+  const comparison = latestPipeline?.result?.comparison;
 
   const hasRawImages = rawImages.length > 0;
   const hasProcessedImages = processedImages.length > 0;
@@ -150,77 +190,165 @@ export default function ProjectDetailPage() {
   const hasAnyAssets = hasRawImages || hasProcessedImages || hasMasks;
   const hasResult = Boolean(latestPipeline?.result);
 
+  const isCompleted = latestPipeline?.status === "completed";
+  const isFailed = latestPipeline?.status === "failed";
+  const isCancelled = latestPipeline?.status === "cancelled";
+
+  const handleChangeVisibility = async (value: "public" | "private") => {
+    if (!project?.id) return;
+
+    if (!currentUser?.id) {
+      toast.error(t("toast.invalidSession"));
+      return;
+    }
+
+    try {
+      await updateVisibility({
+        id: project.id,
+        userId: currentUser.id,
+        visibility: value,
+      }).unwrap();
+
+      toast.success(
+        value === "public"
+          ? t("toast.visibilityPublic")
+          : t("toast.visibilityPrivate"),
+      );
+
+      refetchProject();
+    } catch {
+      toast.error(t("toast.visibilityFailed"));
+    }
+  };
+
+  const handleManualRefresh = () => {
+    refetchLatestPipeline();
+    refetchAssets();
+  };
+
   if (isLoadingProject || isLoadingPipeline) {
     return (
-      <section className="mx-auto max-w-6xl card p-6 sm:p-8">
-        <p className="text-sm text-slate-500">Đang tải project...</p>
-      </section>
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Loader className="mx-auto animate-spin w-8 h-8" />
+      </main>
     );
   }
 
   return (
-    <section className="mx-auto max-w-6xl card p-6 sm:p-8">
-      <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-wide text-blue-600">
-          Project Detail
-        </p>
+    <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)]">
+        <div className="grid gap-0 lg:grid-cols-[420px_1fr]">
+          <div className="min-h-64 border-b border-[var(--border-base)] bg-[var(--bg-hover)] lg:border-b-0 lg:border-r">
+            {assets?.video?.url ? (
+              <VideoPreview
+                src={assets.video.url}
+                title={assets.video.originalName ?? project?.name}
+                sizeBytes={assets.video.sizeBytes}
+                emptyText={t("noVideo")}
+              />
+            ) : (
+              <LoaderIcon className="mx-auto text-center animate-spin w-8 h-8" />
+            )}
+          </div>
 
-        <h1 className="mt-1 text-2xl font-bold text-ink dark:text-slate-100">
-          {project?.name ?? "Untitled Project"}
-        </h1>
+          <div className="space-y-5 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-[var(--brand)]">
+                  {t("eyebrow")}
+                </p>
 
-        <p className="mt-2 text-sm text-steel dark:text-slate-400">
-          Project ID: {projectId}
-        </p>
-      </div>
+                <h1 className="mt-1 text-2xl font-bold text-[var(--text-base)]">
+                  {project?.name ?? t("untitledProject")}
+                </h1>
 
-      {latestPipeline ? (
-        <div className="mt-4 flex items-center gap-4">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Visibility
-          </span>
+                <p className="mt-2 text-sm text-[var(--text-muted)]">
+                  {project?.description ?? t("noDescription")}
+                </p>
+              </div>
+            </div>
 
-          <select
-            value={project?.visibility ?? "private"}
-            disabled={isUpdatingVisibility}
-            onChange={(event) =>
-              handleChangeVisibility(event.target.value as "public" | "private")
-            }
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-ink outline-none hover:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-          >
-            <option value="private">Private</option>
-            <option value="public">Public</option>
-          </select>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] p-4">
+                <p className="text-xs text-[var(--text-muted)]">
+                  {t("pipelineStatus")}
+                </p>
+
+                <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-[var(--text-base)]">
+                  <StatusIcon status={latestPipeline?.status} />
+                  {t(`status.${latestPipeline?.status ?? "unknown"}`)}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] p-4">
+                <p className="text-xs text-[var(--text-muted)]">
+                  {t("progress")}
+                </p>
+
+                <p className="mt-2 text-sm font-semibold text-[var(--text-base)]">
+                  {latestPipeline?.progress ?? 0}%
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] p-4">
+                <p className="text-xs text-[var(--text-muted)]">
+                  {t("visibility")}
+                </p>
+
+                <div className="mt-2 flex items-center gap-2">
+                  {project?.visibility === "public" ? (
+                    <Eye className="h-4 w-4 text-[var(--brand)]" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-[var(--text-muted)]" />
+                  )}
+
+                  <select
+                    value={project?.visibility ?? "private"}
+                    disabled={isUpdatingVisibility}
+                    onChange={(event) =>
+                      handleChangeVisibility(
+                        event.target.value as "public" | "private",
+                      )
+                    }
+                    className="w-full rounded-lg border border-[var(--border-base)] bg-[var(--bg-panel)] px-2 py-1.5 text-xs font-medium text-[var(--text-base)] outline-none transition hover:border-[var(--border-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <option value="private">{t("visibilityPrivate")}</option>
+                    <option value="public">{t("visibilityPublic")}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      ) : null}
+      </section>
 
-      {isRunning ? (
-        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-800 dark:bg-blue-950">
-          <div className="flex items-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+      {shouldPollPipeline ? (
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5">
+          <div className="flex items-start gap-3">
+            <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-[var(--brand)]" />
 
             <div>
-              <h2 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                Đang xử lý
+              <h2 className="text-sm font-semibold text-[var(--text-base)]">
+                {t("runningTitle")}
               </h2>
 
-              <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                Giai đoạn: {latestPipeline?.currentStage ?? "pipeline_running"}
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
+                {t("runningDescription", {
+                  stage: latestPipeline?.currentStage ?? "pipeline_running",
+                })}
               </p>
             </div>
           </div>
-
-          <p className="mt-3 text-xs text-blue-600 dark:text-blue-400">
-            Bạn có thể rời trang này, pipeline vẫn tiếp tục chạy nền. Dữ liệu sẽ
-            được cập nhật dần khi từng bước hoàn tất.
-          </p>
-        </div>
+        </section>
       ) : null}
 
       {isLoadingAssets && !hasAnyAssets ? (
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900">
-          Đang tải ảnh, mask và kết quả...
-        </div>
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-6">
+          <Loader className="mx-auto" />
+          <p className="mt-3 text-center text-sm text-[var(--text-muted)]">
+            {t("loadingAssets")}
+          </p>
+        </section>
       ) : null}
 
       {hasAnyAssets ? (
@@ -237,44 +365,39 @@ export default function ProjectDetailPage() {
       {hasResult ? <OpenSfMResultView result={latestPipeline?.result} /> : null}
 
       {isCompleted && !hasResult ? (
-        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-          Pipeline đã hoàn tất nhưng chưa có dữ liệu comparison trả về.
-        </div>
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5 text-sm text-[var(--text-muted)]">
+          {t("completedWithoutResult")}
+        </section>
       ) : null}
 
       {isFailed ? (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
-          <p className="font-semibold">Pipeline thất bại</p>
+        <section className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+          <p className="font-semibold">{t("failedTitle")}</p>
           <p className="mt-1">
-            {latestPipeline?.errorMessage ??
-              "Quá trình xử lý gặp lỗi. Vui lòng kiểm tra log backend."}
+            {latestPipeline?.errorMessage ?? t("failedDescription")}
           </p>
 
           <button
             type="button"
-            onClick={() => {
-              setPipelinePollingInterval(5000);
-              refetchLatestPipeline();
-              refetchAssets();
-            }}
-            className="mt-3 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-900"
+            onClick={handleManualRefresh}
+            className="mt-3 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium transition hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-900"
           >
-            Tải lại trạng thái
+            {t("reloadStatus")}
           </button>
-        </div>
+        </section>
       ) : null}
 
       {isCancelled ? (
-        <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-          Pipeline đã bị huỷ.
-        </div>
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5 text-sm text-[var(--text-muted)]">
+          {t("cancelledDescription")}
+        </section>
       ) : null}
 
       {!latestPipeline ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900">
-          Project này chưa có pipeline nào.
-        </div>
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5 text-sm text-[var(--text-muted)]">
+          {t("noPipeline")}
+        </section>
       ) : null}
-    </section>
+    </main>
   );
 }

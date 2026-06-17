@@ -19,13 +19,13 @@ import { getErrorMessage } from "../_components/utils";
 type ProjectVisibility = "public" | "private";
 
 export default function CreateProjectPage() {
-  const t = useTranslations("projects");
+  const t = useTranslations("projects.create");
   const router = useRouter();
   const params = useParams();
 
   const locale = params.locale as string;
 
-  const addPipeline = usePipelineStore((s) => s.addPipeline);
+  const addPipeline = usePipelineStore((state) => state.addPipeline);
 
   const [file, setFile] = useState<File | null>(null);
   const [projectName, setProjectName] = useState("");
@@ -45,7 +45,7 @@ export default function CreateProjectPage() {
 
   const onUpload = async () => {
     if (!file) {
-      setMessage("Vui lòng chọn video.");
+      setMessage(t("videoRequired"));
       return;
     }
 
@@ -109,11 +109,12 @@ export default function CreateProjectPage() {
         currentStage: "queued",
       });
 
-      toast.success("Pipeline đã bắt đầu chạy nền.");
+      toast.success(t("pipelineStarted"));
 
       router.push(`/${locale}/projects/${uploaded.projectId}`);
     } catch (error) {
       const errorMessage = getErrorMessage(error) || t("uploadFailed");
+
       setMessage(errorMessage);
       toast.error(errorMessage);
     }
@@ -122,41 +123,41 @@ export default function CreateProjectPage() {
   const isBusy = isUploading || isStartingPipeline;
 
   return (
-    <section className="mx-auto max-w-6xl card p-6 sm:p-8">
-      <ProjectUploadPanel
-        title="Tạo project mới"
-        subtitle="Upload video, bổ sung metadata và khởi chạy pipeline xử lý nền."
-        projectNameLabel={t("projectName")}
-        projectNamePlaceholder={t("projectNamePlaceholder")}
-        projectName={projectName}
-        onProjectNameChange={setProjectName}
-        descriptionLabel="Mô tả project"
-        descriptionPlaceholder="Ví dụ: Video test tái dựng cảnh đường phố, quay bằng điện thoại..."
-        description={description}
-        onDescriptionChange={setDescription}
-        datasetNameLabel="Tên dataset"
-        datasetNamePlaceholder="Nếu bỏ trống sẽ dùng tên project"
-        datasetName={datasetName}
-        onDatasetNameChange={setDatasetName}
-        visibilityLabel="Chế độ hiển thị"
-        visibility={visibility}
-        onVisibilityChange={setVisibility}
-        file={file}
-        onFileSelect={setFile}
-        onRemoveFile={() => setFile(null)}
-        message={message}
-        uploadProgress={uploadProgress}
-        uploadedVideo={uploadedVideo}
-        processingStage={isBusy ? "extracting" : "idle"}
-        isUploading={isBusy}
-        isExtracting={false}
-        uploadButtonLabel={
-          isBusy ? "Đang xử lý..." : "Tạo project và chạy pipeline"
-        }
-        nextButtonLabel={undefined}
-        onUpload={onUpload}
-        onNextStep={undefined}
-      />
-    </section>
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-6 sm:p-8">
+        <ProjectUploadPanel
+          title={t("title")}
+          subtitle={t("subtitle")}
+          projectNameLabel={t("projectName")}
+          projectNamePlaceholder={t("projectNamePlaceholder")}
+          projectName={projectName}
+          onProjectNameChange={setProjectName}
+          descriptionLabel={t("description")}
+          descriptionPlaceholder={t("descriptionPlaceholder")}
+          description={description}
+          onDescriptionChange={setDescription}
+          datasetNameLabel={t("datasetName")}
+          datasetNamePlaceholder={t("datasetNamePlaceholder")}
+          datasetName={datasetName}
+          onDatasetNameChange={setDatasetName}
+          visibilityLabel={t("visibility")}
+          visibility={visibility}
+          onVisibilityChange={setVisibility}
+          file={file}
+          onFileSelect={setFile}
+          onRemoveFile={() => setFile(null)}
+          message={message}
+          uploadProgress={uploadProgress}
+          uploadedVideo={uploadedVideo}
+          processingStage={isBusy ? "extracting" : "idle"}
+          isUploading={isBusy}
+          isExtracting={false}
+          uploadButtonLabel={isBusy ? t("processingButton") : t("submitButton")}
+          nextButtonLabel={undefined}
+          onUpload={onUpload}
+          onNextStep={undefined}
+        />
+      </section>
+    </main>
   );
 }

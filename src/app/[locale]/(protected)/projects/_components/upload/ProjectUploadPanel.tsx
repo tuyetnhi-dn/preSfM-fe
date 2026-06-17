@@ -153,8 +153,8 @@ export function ProjectUploadPanel({
           }
           className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-brand disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         >
-          <option value="private">Private - chỉ mình tôi xem</option>
-          <option value="public">Public - hiển thị ở trang Home</option>
+          <option value="private">Private</option>
+          <option value="public">Public</option>
         </select>
       </div>
 

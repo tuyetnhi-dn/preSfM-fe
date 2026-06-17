@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, ImageIcon, Loader2, X } from "lucide-react";
+import { Download, ImageIcon, Loader, Loader2, X } from "lucide-react";
 
 import type { ImageAsset } from "../types";
 
@@ -121,7 +121,9 @@ export function ImageGrid({
                 <Download className="h-4 w-4" />
               )}
 
-              {isDownloading ? "Downloading..." : "Download all"}
+              {isDownloading ? (
+                <Loader className="h-4 w-4 animate-spin" />
+              ) : null}
             </button>
           )}
         </div>

@@ -12,7 +12,16 @@ export type ProjectDetailResponse = {
   updatedAt?: string;
 };
 
+export type ProjectAssetVideoDto = {
+  id: string;
+  datasetId: string;
+  originalName: string | null;
+  mimeType: string | null;
+  sizeBytes: number | null;
+  url: string | null;
+};
 export type ProjectAssetsResponse = {
+  video?: ProjectAssetVideoDto | null;
   rawImages?: ImageAssetItem[];
   processedImages?: ImageAssetItem[];
   masks?: ImageAssetItem[];

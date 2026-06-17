@@ -67,6 +67,10 @@
     "projectName": "Tên project",
     "projectNamePlaceholder": "Nhập tên project",
     "projectNameRequired": "Vui lòng nhập tên project.",
+    "createProjectButton": "Tạo project",
+    "listTitle": "Danh sách dự án",
+    "listDescription": "Các dự án bạn đã tạo và đang xử lý. Nhấn vào một dự án để xem chi tiết và tiến trình xử lý.",
+    "emptyMyProjects": "Bạn chưa có dự án nào. Hãy tạo một dự án mới để bắt đầu.  ",
     "pipelineFlowBoard": {
       "title": "Luồng pipeline",
       "stages": {
@@ -93,8 +97,103 @@
         "mask_description": "Mask tương ứng với ảnh đã xử lý",
         "mask_empty": "Không có mask nào được tạo ra"
       }
+    },
+    "opensfmResultView": {
+      "title": "So sánh kết quả tái dựng OpenSfM",
+      "description": "So sánh kết quả tái dựng giữa luồng ảnh gốc và luồng ảnh đã tiền xử lý.",
+      "rawFlowTitle": "Point Cloud luồng gốc",
+      "processedFlowTitle": "Point Cloud luồng đã xử lý",
+      "downloadPLY": "Tải PLY"
+    },
+    "create": {
+      "title": "Tạo project mới",
+      "subtitle": "Upload video, bổ sung metadata và khởi chạy pipeline xử lý nền.",
+
+      "projectName": "Tên project",
+      "projectNamePlaceholder": "Ví dụ: Tái dựng cảnh trường Bách Khoa",
+
+      "description": "Mô tả project",
+      "descriptionPlaceholder": "Ví dụ: Video test tái dựng cảnh đường phố, quay bằng điện thoại...",
+
+      "datasetName": "Tên dataset",
+      "datasetNamePlaceholder": "Nếu bỏ trống sẽ dùng tên project",
+
+      "visibility": "Chế độ hiển thị",
+
+      "videoRequired": "Vui lòng chọn video.",
+      "projectNameRequired": "Vui lòng nhập tên project.",
+      "invalidSession": "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.",
+      "uploadFailed": "Không thể tạo project hoặc khởi chạy pipeline.",
+
+      "submitButton": "Tạo project và chạy pipeline",
+      "processingButton": "Đang xử lý...",
+
+      "pipelineStarted": "Pipeline đã bắt đầu chạy nền."
     }
   },
+  "projectDetail": {
+    "eyebrow": "Chi tiết project",
+    "untitledProject": "Project chưa đặt tên",
+    "noDescription": "Không có mô tả",
+    "noVideo": "Project chưa có video",
+
+    "pipelineStatus": "Trạng thái pipeline",
+    "progress": "Tiến độ",
+    "visibility": "Hiển thị",
+    "visibilityPrivate": "Private",
+    "visibilityPublic": "Public",
+    "mode": "Chế độ",
+    "stage": "Giai đoạn",
+
+    "runningTitle": "Pipeline đang xử lý",
+    "runningDescription": "Giai đoạn hiện tại: {stage}. Bạn có thể rời trang, hệ thống vẫn tiếp tục chạy nền.",
+
+    "loadingAssets": "Đang tải ảnh, mask và kết quả...",
+    "completedWithoutResult": "Pipeline đã hoàn tất nhưng chưa có dữ liệu comparison trả về.",
+    "failedTitle": "Pipeline thất bại",
+    "failedDescription": "Quá trình xử lý gặp lỗi. Vui lòng kiểm tra log backend.",
+    "reloadStatus": "Tải lại trạng thái",
+    "cancelledDescription": "Pipeline đã bị huỷ.",
+    "noPipeline": "Project này chưa có pipeline nào.",
+
+    "status": {
+      "pending": "Đang chờ",
+      "running": "Đang chạy",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn tất",
+      "failed": "Thất bại",
+      "cancelled": "Đã huỷ",
+      "unknown": "Không xác định"
+    },
+
+    "metrics": {
+      "reconstructedImages": "Ảnh tái dựng",
+      "sparsePoints": "Sparse points",
+      "densePoints": "Dense points",
+      "reprojectionError": "Reprojection error",
+      "gain": "Chênh lệch",
+      "improvement": "Cải thiện"
+    },
+    "opensfmMetrics": {
+      "title": "So sánh kết quả OpenSfM",
+      "description": "Đối chiếu chất lượng tái dựng giữa Raw Flow và Processed Flow.",
+      "criterion": "Tiêu chí",
+      "rawFlow": "Raw Flow",
+      "processedFlow": "Processed Flow",
+      "difference": "Chênh lệch",
+      "reconstructedImages": "Ảnh tái dựng",
+      "sparsePoints": "Sparse points",
+      "densePoints": "Dense points",
+      "reprojectionError": "Reprojection error"
+    },
+
+    "toast": {
+      "visibilityPublic": "Project đã chuyển sang Public.",
+      "visibilityPrivate": "Project đã chuyển sang Private.",
+      "visibilityFailed": "Không thể cập nhật chế độ hiển thị."
+    }
+  },
+
   "viewer": {
     "title": "Trình xem 3D",
     "modelId": "Mã model"
