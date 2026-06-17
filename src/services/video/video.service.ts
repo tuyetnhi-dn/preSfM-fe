@@ -21,6 +21,11 @@ import {
   RunOpenSfMComparisonBody,
   RunOpenSfMComparisonResponse,
 } from "@/types/dtos/video/opensfm.dto";
+import {
+  PipelineRunStatusResponse,
+  RunFullPipelineDto,
+  RunFullPipelineResponse,
+} from "@/types/dtos/video/run-full-pipeline.type";
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -194,6 +199,37 @@ export const videoApi = createApi({
       query: (videoId) => `/videos/${videoId}/assets`,
     }),
 
+    runFullPipeline: builder.mutation<
+      {
+        message: string;
+        videoId: string;
+        pipelineRunId: string;
+      },
+      {
+        videoId: string;
+        body: {
+          sampleFps: number;
+          blurThreshold: number;
+          noiseThreshold: number;
+          runDense: boolean;
+          mode?: "fast" | "balanced" | "quality";
+        };
+      }
+    >({
+      query: ({ videoId, body }) => ({
+        url: `/videos/${videoId}/run-full-pipeline`,
+        method: "POST",
+        body,
+      }),
+    }),
+
+    getPipelineRunStatus: builder.query<any, string>({
+      query: (pipelineRunId) => ({
+        url: `/videos/pipeline-runs/${pipelineRunId}/status`,
+        method: "GET",
+      }),
+    }),
+
     runOpenSfMComparison: builder.mutation<
       RunOpenSfMComparisonResponse,
       {
@@ -222,4 +258,6 @@ export const {
   usePreprocessAndGenerateMasksMutation,
   useGetVideoAssetsQuery,
   useRunOpenSfMComparisonMutation,
+  useRunFullPipelineMutation,
+  useGetPipelineRunStatusQuery,
 } = videoApi;

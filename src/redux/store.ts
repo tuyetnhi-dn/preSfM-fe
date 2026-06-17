@@ -1,4 +1,5 @@
 import { authApi } from "@/services/auth/auth.service";
+import { projectApi } from "@/services/project/project.service";
 import { videoApi } from "@/services/video/video.service";
 import { configureStore } from "@reduxjs/toolkit";
 
@@ -7,9 +8,14 @@ export const makeStore = () => {
     reducer: {
       [authApi.reducerPath]: authApi.reducer,
       [videoApi.reducerPath]: videoApi.reducer,
+      [projectApi.reducerPath]: projectApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(authApi.middleware, videoApi.middleware),
+      getDefaultMiddleware().concat(
+        authApi.middleware,
+        videoApi.middleware,
+        projectApi.middleware,
+      ),
   });
 };
 

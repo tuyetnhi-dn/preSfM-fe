@@ -121,6 +121,17 @@ export type FrameImageDto = {
   processed: FrameStorageAssetDto | null;
   mask: FrameStorageAssetDto | null;
 };
+export type FrameImageLike = {
+  id?: string | null;
+  url?: string | null;
+  signedUrl?: string | null;
+  storageUrl?: string | null;
+  objectPath?: string | null;
+  originalName?: string | null;
+  fileName?: string | null;
+  frameIndex?: number | null;
+  timestampMs?: number | null;
+};
 
 export type ExtractFramesResType = {
   pipelineRun: PipelineRunDto;

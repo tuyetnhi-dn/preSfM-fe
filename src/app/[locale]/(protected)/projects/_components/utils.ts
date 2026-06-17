@@ -1,4 +1,7 @@
-import type { FrameImageDto } from "@/types/dtos/video/video.dto";
+import type {
+  FrameImageDto,
+  FrameImageLike,
+} from "@/types/dtos/video/video.dto";
 import type { ImageAsset } from "./types";
 
 export function getErrorMessage(error: unknown): string {
@@ -26,52 +29,33 @@ function getFileNameFromPath(path?: string) {
   return path.split("/").pop() || path;
 }
 
-export function mapRawFramesToImages(frames: FrameImageDto[]): ImageAsset[] {
-  return frames
-    .filter((frame) => Boolean(frame.raw?.url))
-    .map((frame) => ({
-      id: frame.id,
-      name:
-        getFileNameFromPath(frame.raw?.path) ||
-        `frame_${String(frame.frameIndex + 1).padStart(6, "0")}.jpg`,
-      url: frame.raw?.url,
-      frameIndex: frame.frameIndex,
-      timestampMs: frame.timestampMs,
-      width: frame.width,
-      height: frame.height,
-    }));
+export function mapRawFramesToImages(frames: FrameImageLike[]) {
+  return frames.map((frame, index) => ({
+    id: frame.id ?? `raw-${index}`,
+    name: frame.originalName ?? frame.fileName ?? `Raw frame ${index + 1}`,
+    url: frame.url ?? frame.signedUrl ?? frame.storageUrl ?? "",
+    frameIndex: frame.frameIndex ?? index,
+    timestampMs: frame.timestampMs ?? undefined,
+  }));
 }
 
-export function mapProcessedFramesToImages(
-  frames: FrameImageDto[],
-): ImageAsset[] {
-  return frames
-    .filter((frame) => Boolean(frame.processed?.url))
-    .map((frame) => ({
-      id: frame.id,
-      name:
-        getFileNameFromPath(frame.processed?.path) ||
-        `processed_${String(frame.frameIndex + 1).padStart(6, "0")}.jpg`,
-      url: frame.processed?.url,
-      frameIndex: frame.frameIndex,
-      timestampMs: frame.timestampMs,
-      width: frame.width,
-      height: frame.height,
-    }));
+export function mapProcessedFramesToImages(frames: FrameImageLike[]) {
+  return frames.map((frame, index) => ({
+    id: frame.id ?? `processed-${index}`,
+    name:
+      frame.originalName ?? frame.fileName ?? `Processed frame ${index + 1}`,
+    url: frame.url ?? frame.signedUrl ?? frame.storageUrl ?? "",
+    frameIndex: frame.frameIndex ?? index,
+    timestampMs: frame.timestampMs ?? undefined,
+  }));
 }
 
-export function mapMaskFramesToImages(frames: FrameImageDto[]): ImageAsset[] {
-  return frames
-    .filter((frame) => Boolean(frame.mask?.url))
-    .map((frame) => ({
-      id: frame.id,
-      name:
-        getFileNameFromPath(frame.mask?.path) ||
-        `mask_${String(frame.frameIndex + 1).padStart(6, "0")}.png`,
-      url: frame.mask?.url,
-      frameIndex: frame.frameIndex,
-      timestampMs: frame.timestampMs,
-      width: frame.width,
-      height: frame.height,
-    }));
+export function mapMaskFramesToImages(frames: FrameImageLike[]) {
+  return frames.map((frame, index) => ({
+    id: frame.id ?? `mask-${index}`,
+    name: frame.originalName ?? frame.fileName ?? `Mask ${index + 1}`,
+    url: frame.url ?? frame.signedUrl ?? frame.storageUrl ?? "",
+    frameIndex: frame.frameIndex ?? index,
+    timestampMs: frame.timestampMs ?? undefined,
+  }));
 }

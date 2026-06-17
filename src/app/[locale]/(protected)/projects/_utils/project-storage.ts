@@ -1,37 +1,39 @@
 import { PROJECT_LOCAL_STORAGE_KEY } from "../_constants/project-storage-key";
+import type { UploadedVideoState } from "../_components/types";
+import type { RunOpenSfMComparisonResponse } from "@/types/dtos/video/opensfm.dto";
 
-export type StoredProjectState = {
-  uploadedVideo: any | null;
+export type StoredFullPipelineState = {
   projectName: string;
+  uploadedVideo: UploadedVideoState | null;
   pipelineRunId: string;
-  processingStage: string;
-  opensfmResult: any | null;
+  pipelineStatus: "idle" | "uploading" | "processing" | "completed" | "failed";
+  opensfmResult: RunOpenSfMComparisonResponse | null;
 };
 
-const defaultState: StoredProjectState = {
-  uploadedVideo: null,
-  projectName: "",
-  pipelineRunId: "",
-  processingStage: "idle",
-  opensfmResult: null,
-};
-
-export function getStoredProject(): StoredProjectState | null {
+export function getStoredFullPipeline(): StoredFullPipelineState | null {
   if (typeof window === "undefined") return null;
 
   try {
-    const saved = localStorage.getItem(PROJECT_LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : null;
+    const raw = localStorage.getItem(PROJECT_LOCAL_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
   } catch {
     localStorage.removeItem(PROJECT_LOCAL_STORAGE_KEY);
     return null;
   }
 }
 
-export function saveStoredProject(state: Partial<StoredProjectState>) {
+export function saveStoredFullPipeline(
+  state: Partial<StoredFullPipelineState>,
+) {
   if (typeof window === "undefined") return;
 
-  const oldState = getStoredProject() ?? defaultState;
+  const oldState = getStoredFullPipeline() ?? {
+    projectName: "",
+    uploadedVideo: null,
+    pipelineRunId: "",
+    pipelineStatus: "idle",
+    opensfmResult: null,
+  };
 
   localStorage.setItem(
     PROJECT_LOCAL_STORAGE_KEY,
@@ -42,7 +44,7 @@ export function saveStoredProject(state: Partial<StoredProjectState>) {
   );
 }
 
-export function clearStoredProject() {
+export function clearStoredFullPipeline() {
   if (typeof window === "undefined") return;
 
   localStorage.removeItem(PROJECT_LOCAL_STORAGE_KEY);

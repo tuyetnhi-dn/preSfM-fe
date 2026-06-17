@@ -33,9 +33,9 @@ type ProjectUploadPanelProps = {
   isExtracting: boolean;
 
   uploadButtonLabel: string;
-  nextButtonLabel: string;
+  nextButtonLabel?: string;
   onUpload: () => void;
-  onNextStep: () => void;
+  onNextStep?: () => void;
 };
 
 export function ProjectUploadPanel({

@@ -1,38 +1,60 @@
-import { formatMetric, formatNumber } from "../../_utils/project-format";
-
-type MetricItem = {
-  label: string;
-  raw?: number | null;
-  processed?: number | null;
-  suffix?: string;
-};
-
 type Props = {
   raw?: any;
   processed?: any;
+  comparison?: any;
 };
 
-export function OpenSfMMetricsTable({ raw, processed }: Props) {
-  const metrics: MetricItem[] = [
+function formatNumber(value?: number | null) {
+  if (value === null || value === undefined) return "-";
+
+  return value.toLocaleString("vi-VN");
+}
+
+function formatMetric(value?: number | null) {
+  if (value === null || value === undefined) return "-";
+
+  return Number(value).toFixed(4);
+}
+
+function renderDiff(value?: number | null) {
+  if (value === null || value === undefined) {
+    return "-";
+  }
+
+  const sign = value > 0 ? "+" : "";
+
+  return `${sign}${value.toFixed(2)}%`;
+}
+
+export function OpenSfMMetricsTable({ raw, processed, comparison }: Props) {
+  const rows = [
     {
       label: "Ảnh tái dựng",
       raw: raw?.reconstructedImages,
       processed: processed?.reconstructedImages,
+      diff: comparison?.reconstructedImageGain,
+      type: "count",
     },
     {
       label: "Sparse points",
-      raw: raw?.sparsePoints,
-      processed: processed?.sparsePoints,
+      raw: raw?.sparsePointCount,
+      processed: processed?.sparsePointCount,
+      diff: comparison?.sparsePointGainPercent,
+      type: "percent",
     },
     {
       label: "Dense points",
-      raw: raw?.densePoints,
-      processed: processed?.densePoints,
+      raw: raw?.densePointCount,
+      processed: processed?.densePointCount,
+      diff: comparison?.densePointGainPercent,
+      type: "percent",
     },
     {
       label: "Reprojection error",
-      raw: raw?.reprojectionError,
-      processed: processed?.reprojectionError,
+      raw: raw?.avgReprojectionError,
+      processed: processed?.avgReprojectionError,
+      diff: comparison?.reprojectionErrorImprovementPercent,
+      type: "metric",
     },
   ];
 
@@ -42,27 +64,34 @@ export function OpenSfMMetricsTable({ raw, processed }: Props) {
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr>
             <th className="px-4 py-3 text-left">Tiêu chí</th>
-            <th className="px-4 py-3 text-left">Raw flow</th>
-            <th className="px-4 py-3 text-left">Processed flow</th>
+            <th className="px-4 py-3 text-left">Raw Flow</th>
+            <th className="px-4 py-3 text-left">Processed Flow</th>
+            <th className="px-4 py-3 text-left">Chênh lệch</th>
           </tr>
         </thead>
 
         <tbody>
-          {metrics.map((item) => (
+          {rows.map((row) => (
             <tr
-              key={item.label}
+              key={row.label}
               className="border-t border-slate-200 dark:border-slate-700"
             >
-              <td className="px-4 py-3 font-medium">{item.label}</td>
+              <td className="px-4 py-3 font-medium">{row.label}</td>
+
               <td className="px-4 py-3">
-                {item.label === "Reprojection error"
-                  ? formatMetric(item.raw)
-                  : formatNumber(item.raw)}
+                {row.type === "metric"
+                  ? formatMetric(row.raw)
+                  : formatNumber(row.raw)}
               </td>
+
               <td className="px-4 py-3">
-                {item.label === "Reprojection error"
-                  ? formatMetric(item.processed)
-                  : formatNumber(item.processed)}
+                {row.type === "metric"
+                  ? formatMetric(row.processed)
+                  : formatNumber(row.processed)}
+              </td>
+
+              <td className="px-4 py-3 font-medium">
+                {row.type === "count" ? row.diff : renderDiff(row.diff)}
               </td>
             </tr>
           ))}
