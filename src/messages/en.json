@@ -8,15 +8,15 @@
   },
 
   "home": {
-    "title": "Home",
-    "subtitle": "Quickly track recent video processing projects in PreSfM.",
+    "title": "PreSfM",
+    "subtitle": "A video pre-processing system designed to improve 3D reconstruction quality with OpenSfM.",
+    "createProjectButton": "Create project",
+    "unknownUploader": "Unknown uploader",
     "createProjectTitle": "Create new project",
-    "createProjectDescription": "Upload a video so the system can automatically create a project, dataset, and prepare data for the OpenSfM pipeline.",
-    "createProjectButton": "Create new project",
-    "recentProjects": "Recent projects",
-    "recentProjectsDescription": "Showing up to 5 of your latest projects/videos.",
-    "loadingProjects": "Loading projects...",
-    "unknownUploader": "User"
+    "createProjectDescription": "Upload a video and the system will automatically create a project, dataset and prepare the data for OpenSfM pipeline.",
+    "publicProjectsTitle": "Public projects",
+    "publicProjectsDescription": "Projects publicly shared in the system.",
+    "emptyPublicProjects": "No public projects yet."
   },
 
   "nav": {

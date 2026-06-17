@@ -5,6 +5,17 @@ import type {
   ProjectAssetsResponse,
   ProjectDetailResponse,
 } from "@/types/dtos/project/project-detail.dto";
+import {
+  PaginatedResponse,
+  ProjectListItemDto,
+} from "@/types/dtos/project/project.dto";
+
+export type GetProjectsQuery = {
+  scope: "public" | "mine";
+  page?: number;
+  limit?: number;
+  userId?: string;
+};
 
 export const projectApi = createApi({
   reducerPath: "projectApi",
@@ -13,11 +24,49 @@ export const projectApi = createApi({
   }),
   tagTypes: ["Project"],
   endpoints: (builder) => ({
-    getProjectById: builder.query<ProjectDetailResponse, string>({
-      query: (projectId) => `/projects/${projectId}`,
-      providesTags: (_result, _error, projectId) => [
-        { type: "Project", id: projectId },
-      ],
+    getProjectById: builder.query<
+      ProjectListItemDto,
+      {
+        id: string;
+        userId?: string;
+      }
+    >({
+      query: ({ id, userId }) => {
+        const params = new URLSearchParams();
+
+        if (userId) {
+          params.set("userId", userId);
+        }
+
+        const suffix = params.toString();
+
+        return {
+          url: `/projects/${id}${suffix ? `?${suffix}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: (_result, _error, { id }) => [{ type: "Project", id }],
+    }),
+    getProjects: builder.query<
+      PaginatedResponse<ProjectListItemDto>,
+      GetProjectsQuery
+    >({
+      query: ({ scope, page = 1, limit = 12, userId }) => {
+        const params = new URLSearchParams();
+
+        params.set("scope", scope);
+        params.set("page", String(page));
+        params.set("limit", String(limit));
+
+        if (userId) {
+          params.set("userId", userId);
+        }
+
+        return {
+          url: `/projects?${params.toString()}`,
+          method: "GET",
+        };
+      },
     }),
 
     getProjectAssets: builder.query<ProjectAssetsResponse, string>({
@@ -36,6 +85,34 @@ export const projectApi = createApi({
         { type: "Project", id: `${projectId}-latest-pipeline` },
       ],
     }),
+    updateProjectVisibility: builder.mutation<
+      { success: boolean },
+      {
+        id: string;
+        userId?: string;
+        visibility: "public" | "private";
+      }
+    >({
+      query: ({ id, userId, visibility }) => {
+        const params = new URLSearchParams();
+
+        if (userId) {
+          params.set("userId", userId);
+        }
+
+        const suffix = params.toString();
+
+        return {
+          url: `/projects/${id}/visibility${suffix ? `?${suffix}` : ""}`,
+          method: "PATCH",
+          body: { visibility },
+        };
+      },
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Project", id: arg.id },
+        "Project",
+      ],
+    }),
   }),
 });
 
@@ -43,4 +120,6 @@ export const {
   useGetProjectByIdQuery,
   useGetProjectAssetsQuery,
   useGetLatestProjectPipelineQuery,
+  useGetProjectsQuery,
+  useUpdateProjectVisibilityMutation,
 } = projectApi;

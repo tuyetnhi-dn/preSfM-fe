@@ -8,14 +8,14 @@
   },
   "home": {
     "title": "Trang chủ",
-    "subtitle": "Theo dõi nhanh các project xử lý video gần đây trong hệ thống PreSfM.",
+    "subtitle": "Hệ thống tiền xử lý dữ liệu video nhằm nâng cao chất lượng tái dựng 3D bằng OpenSfM.",
+    "createProjectButton": "Tạo project",
+    "unknownUploader": "Không xác định",
     "createProjectTitle": "Tạo project mới",
-    "createProjectDescription": "Tải video lên để hệ thống tự tạo project, dataset và chuẩn bị dữ liệu cho pipeline OpenSfM.",
-    "createProjectButton": "Tạo project mới",
-    "recentProjects": "Project gần đây",
-    "recentProjectsDescription": "Hiển thị tối đa 5 project/video mới nhất của bạn.",
-    "loadingProjects": "Đang tải danh sách project...",
-    "unknownUploader": "Người dùng"
+    "createProjectDescription": "Tải lên một video và hệ thống sẽ tự động tạo project, dataset và chuẩn bị dữ liệu cho pipeline OpenSfM.",
+    "publicProjectsTitle": "Project công khai",
+    "publicProjectsDescription": "Các project được chia sẻ công khai trong hệ thống.",
+    "emptyPublicProjects": "Chưa có project công khai."
   },
   "nav": {
     "dashboard": "Dashboard",

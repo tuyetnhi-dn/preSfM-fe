@@ -10,11 +10,13 @@ export type StorageFileType = {
   sizeBytes: number;
 };
 
-export type UploadVideoBodyType = {
+export type UploadVideoReqType = {
   file: File;
-  datasetId?: string;
-  uploadedBy?: string;
-  projectName?: string;
+  uploadedBy: string;
+  projectName: string;
+  description?: string;
+  visibility?: "public" | "private";
+  datasetName?: string;
   onProgress?: (progress: number) => void;
 };
 

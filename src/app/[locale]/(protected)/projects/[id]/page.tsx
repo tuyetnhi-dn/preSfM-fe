@@ -7,6 +7,7 @@ import {
   useGetLatestProjectPipelineQuery,
   useGetProjectAssetsQuery,
   useGetProjectByIdQuery,
+  useUpdateProjectVisibilityMutation,
 } from "@/services/project/project.service";
 
 import { PipelineFlowBoard } from "../_components/pipeline/PipelineFlowBoard";
@@ -19,6 +20,9 @@ import {
 } from "../_utils/project-assets.mapper";
 
 import type { UploadedVideoState } from "../_components/types";
+import { getCurrentUser } from "@/lib/auth-storage";
+import { Select } from "radix-ui";
+import toast from "react-hot-toast";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -27,8 +31,14 @@ export default function ProjectDetailPage() {
   const [pipelinePollingInterval, setPipelinePollingInterval] = useState(5000);
   const [lastFetchedStage, setLastFetchedStage] = useState("");
 
-  const { data: project, isLoading: isLoadingProject } =
-    useGetProjectByIdQuery(projectId);
+  const currentUser = getCurrentUser();
+
+  const { data: project, isLoading: isLoadingProject } = useGetProjectByIdQuery(
+    {
+      id: projectId,
+      userId: currentUser?.id,
+    },
+  );
 
   const {
     data: latestPipeline,
@@ -107,6 +117,29 @@ export default function ProjectDetailPage() {
     latestPipeline?.status === "running" ||
     latestPipeline?.status === "processing";
 
+  const [updateVisibility, { isLoading: isUpdatingVisibility }] =
+    useUpdateProjectVisibilityMutation();
+
+  const handleChangeVisibility = async (value: "public" | "private") => {
+    if (!project?.id) return;
+
+    try {
+      await updateVisibility({
+        id: project.id,
+        userId: currentUser?.id,
+        visibility: value,
+      }).unwrap();
+
+      toast.success(
+        value === "public"
+          ? "Project đã chuyển sang Public."
+          : "Project đã chuyển sang Private.",
+      );
+    } catch (error) {
+      toast.error("Không thể cập nhật chế độ hiển thị.");
+    }
+  };
+
   const isCompleted = latestPipeline?.status === "completed";
   const isFailed = latestPipeline?.status === "failed";
   const isCancelled = latestPipeline?.status === "cancelled";
@@ -142,46 +175,22 @@ export default function ProjectDetailPage() {
       </div>
 
       {latestPipeline ? (
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-sm font-semibold text-ink dark:text-slate-100">
-                Trạng thái pipeline
-              </h2>
+        <div className="mt-4 flex items-center gap-4">
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            Visibility
+          </span>
 
-              <p className="mt-1 text-xs text-steel dark:text-slate-400">
-                Pipeline ID: {latestPipeline.id}
-              </p>
-
-              <p className="mt-1 text-xs text-steel dark:text-slate-400">
-                Stage hiện tại:{" "}
-                {latestPipeline.currentStage ?? latestPipeline.status}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setPipelinePollingInterval(5000);
-                refetchLatestPipeline();
-                refetchAssets();
-              }}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-ink hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
-            >
-              Tải lại
-            </button>
-          </div>
-
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-            <div
-              className="h-full rounded-full bg-blue-600 transition-all"
-              style={{ width: `${latestPipeline.progress ?? 0}%` }}
-            />
-          </div>
-
-          <p className="mt-2 text-xs text-steel dark:text-slate-400">
-            Tiến độ: {latestPipeline.progress ?? 0}%
-          </p>
+          <select
+            value={project?.visibility ?? "private"}
+            disabled={isUpdatingVisibility}
+            onChange={(event) =>
+              handleChangeVisibility(event.target.value as "public" | "private")
+            }
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-ink outline-none hover:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+          >
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+          </select>
         </div>
       ) : null}
 

@@ -47,6 +47,7 @@ export default function LoginPage() {
         password,
       }).unwrap();
 
+      // Lưu token và thông tin user vào storage (localStorage/cookies tùy cấu hình của bạn)
       setAuthStorage({
         accessToken: res.accessToken,
         refreshToken: res.refreshToken,
@@ -55,7 +56,12 @@ export default function LoginPage() {
 
       const redirect = searchParams.get("redirect");
 
-      router.push(redirect || `/${locale}/home`);
+      // ─── THÊM LOGIC ĐIỀU HƯỚNG THEO ROLE Ở ĐÂY ───
+      if (res.user?.role === "admin") {
+        router.push(`/${locale}/admin`);
+      } else {
+        router.push(redirect || `/${locale}/home`);
+      }
     } catch (error) {
       setLoginError(getErrorMessage(error));
     }
@@ -97,19 +103,26 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-xl flex items-center text-center justify-center bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
+          className="w-full flex items-center justify-center rounded-xl bg-brand px-4 py-3 text-center font-medium text-white disabled:opacity-60 dark:bg-brand"
         >
           {isLoading ? <Loader /> : t("login")}
         </button>
       </form>
 
-      <p className="mt-4 text-sm text-steel dark:text-slate-300">
-        {t("newUser")}{" "}
+      <p className="mt-4 flex flex-wrap items-center gap-2 text-sm text-steel dark:text-slate-300">
+        <span>{t("newUser")}</span>
         <Link
           href={`/${locale}/auth/register`}
           className="font-medium text-ocean"
         >
           {t("registerWithOtp")}
+        </Link>
+        <span className="text-slate-300 dark:text-slate-600">|</span>
+        <Link
+          href={`/${locale}/auth/forgot-password`}
+          className="font-medium text-ocean"
+        >
+          Quên mật khẩu?
         </Link>
       </p>
     </div>

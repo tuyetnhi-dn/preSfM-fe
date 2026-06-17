@@ -10,7 +10,7 @@ import {
   ExtractFramesResType,
   PreprocessAndGenerateMasksBody,
   PreprocessAndGenerateMasksResponse,
-  UploadVideoBodyType,
+  UploadVideoReqType,
   UploadVideoResType,
   VideoAssetsResponse,
   VideoItemType,
@@ -23,7 +23,6 @@ import {
 } from "@/types/dtos/video/opensfm.dto";
 import {
   PipelineRunStatusResponse,
-  RunFullPipelineDto,
   RunFullPipelineResponse,
 } from "@/types/dtos/video/run-full-pipeline.type";
 
@@ -73,52 +72,99 @@ export const videoApi = createApi({
   refetchOnFocus: false,
   refetchOnReconnect: true,
   endpoints: (builder) => ({
-    uploadVideo: builder.mutation<UploadVideoResType, UploadVideoBodyType>({
-      async queryFn({ file, datasetId, uploadedBy, projectName, onProgress }) {
+    uploadVideo: builder.mutation<UploadVideoResType, UploadVideoReqType>({
+      queryFn: async (
+        {
+          file,
+          uploadedBy,
+          projectName,
+          description,
+          visibility,
+          datasetName,
+          onProgress,
+        },
+        _api,
+        _extraOptions,
+        baseQuery,
+      ) => {
         const formData = new FormData();
 
         formData.append("file", file);
+        formData.append("uploadedBy", uploadedBy);
+        formData.append("projectName", projectName);
 
-        if (datasetId) {
-          formData.append("datasetId", datasetId);
+        if (description) {
+          formData.append("description", description);
         }
 
-        if (uploadedBy) {
-          formData.append("uploadedBy", uploadedBy);
-        }
-        if (projectName) {
-          formData.append("projectName", projectName);
-        }
+        formData.append("visibility", visibility ?? "private");
+        formData.append("datasetName", datasetName || projectName);
 
-        try {
-          const response = await axios.post<UploadVideoResType>(
-            `${API_URL}/videos/upload`,
-            formData,
-            {
-              headers: {
-                ...getAuthHeaders(),
-              },
-              onUploadProgress: (event) => {
-                if (!event.total) return;
+        const xhr = new XMLHttpRequest();
 
-                const progress = Math.round((event.loaded * 100) / event.total);
-                onProgress?.(progress);
-              },
-            },
+        const result = await new Promise<{
+          data?: UploadVideoResType;
+          error?: { status: number; data: unknown };
+        }>((resolve) => {
+          xhr.open(
+            "POST",
+            `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api"}/videos/upload`,
           );
 
-          onProgress?.(100);
+          xhr.upload.onprogress = (event) => {
+            if (!event.lengthComputable) return;
 
-          return {
-            data: response.data,
+            const percent = Math.round((event.loaded / event.total) * 100);
+            onProgress?.(percent);
           };
-        } catch (error) {
+
+          xhr.onload = () => {
+            try {
+              const data = JSON.parse(xhr.responseText);
+
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve({ data });
+              } else {
+                resolve({
+                  error: {
+                    status: xhr.status,
+                    data,
+                  },
+                });
+              }
+            } catch {
+              resolve({
+                error: {
+                  status: xhr.status,
+                  data: xhr.responseText,
+                },
+              });
+            }
+          };
+
+          xhr.onerror = () => {
+            resolve({
+              error: {
+                status: xhr.status || 500,
+                data: "Upload failed",
+              },
+            });
+          };
+
+          xhr.send(formData);
+        });
+
+        if (result.error) {
           return {
-            error: toRtkQueryError(error),
+            error: {
+              status: result.error.status,
+              data: result.error.data,
+            },
           };
         }
+
+        return { data: result.data! };
       },
-      invalidatesTags: ["Videos"],
     }),
 
     getVideos: builder.query<VideoItemType[], string | void>({

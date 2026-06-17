@@ -72,7 +72,7 @@ export function UserIcon() {
 
   const handleInformation = () => {
     setOpen(false);
-    router.push(`/${locale}/account`);
+    router.push(`/${locale}/profile`);
   };
 
   return (

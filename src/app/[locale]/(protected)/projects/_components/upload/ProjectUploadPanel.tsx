@@ -10,6 +10,8 @@ import { VideoDropZone } from "./VideoDropZone";
 import { UploadProgress } from "../common/UploadProgress";
 import type { ProcessingStage, UploadedVideoState } from "../types";
 
+type ProjectVisibility = "public" | "private";
+
 type ProjectUploadPanelProps = {
   title: string;
   subtitle: string;
@@ -18,6 +20,20 @@ type ProjectUploadPanelProps = {
   projectNamePlaceholder: string;
   projectName: string;
   onProjectNameChange: (value: string) => void;
+
+  descriptionLabel?: string;
+  descriptionPlaceholder?: string;
+  description?: string;
+  onDescriptionChange?: (value: string) => void;
+
+  datasetNameLabel?: string;
+  datasetNamePlaceholder?: string;
+  datasetName?: string;
+  onDatasetNameChange?: (value: string) => void;
+
+  visibilityLabel?: string;
+  visibility?: ProjectVisibility;
+  onVisibilityChange?: (value: ProjectVisibility) => void;
 
   file: File | null;
   onFileSelect: (file: File) => void;
@@ -45,6 +61,21 @@ export function ProjectUploadPanel({
   projectNamePlaceholder,
   projectName,
   onProjectNameChange,
+
+  descriptionLabel = "Mô tả project",
+  descriptionPlaceholder = "Nhập mô tả ngắn cho project...",
+  description = "",
+  onDescriptionChange,
+
+  datasetNameLabel = "Tên dataset",
+  datasetNamePlaceholder = "Nếu bỏ trống sẽ dùng tên project",
+  datasetName = "",
+  onDatasetNameChange,
+
+  visibilityLabel = "Chế độ hiển thị",
+  visibility = "private",
+  onVisibilityChange,
+
   file,
   onFileSelect,
   onRemoveFile,
@@ -80,11 +111,60 @@ export function ProjectUploadPanel({
         onChange={onProjectNameChange}
       />
 
-      {file ? (
-        <VideoPreview file={file} onRemove={onRemoveFile} />
-      ) : (
-        <VideoDropZone onFileSelect={onFileSelect} />
-      )}
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-medium text-ink dark:text-slate-100">
+          {descriptionLabel}
+        </label>
+
+        <textarea
+          value={description}
+          disabled={isBusy || isUploadCompleted}
+          onChange={(event) => onDescriptionChange?.(event.target.value)}
+          placeholder={descriptionPlaceholder}
+          rows={4}
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-brand disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        />
+      </div>
+
+      {/* <div className="mt-4">
+        <label className="mb-2 block text-sm font-medium text-ink dark:text-slate-100">
+          {datasetNameLabel}
+        </label>
+
+        <input
+          value={datasetName}
+          disabled={isBusy || isUploadCompleted}
+          onChange={(event) => onDatasetNameChange?.(event.target.value)}
+          placeholder={datasetNamePlaceholder}
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-brand disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        />
+      </div> */}
+
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-medium text-ink dark:text-slate-100">
+          {visibilityLabel}
+        </label>
+
+        <select
+          value={visibility}
+          disabled={isBusy || isUploadCompleted}
+          onChange={(event) =>
+            onVisibilityChange?.(event.target.value as ProjectVisibility)
+          }
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-brand disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        >
+          <option value="private">Private - chỉ mình tôi xem</option>
+          <option value="public">Public - hiển thị ở trang Home</option>
+        </select>
+      </div>
+
+      <div className="mt-4">
+        {file ? (
+          <VideoPreview file={file} onRemove={onRemoveFile} />
+        ) : (
+          <VideoDropZone onFileSelect={onFileSelect} />
+        )}
+      </div>
 
       {isUploading && <UploadProgress progress={uploadProgress} />}
 
@@ -92,7 +172,7 @@ export function ProjectUploadPanel({
         <button
           onClick={onUpload}
           disabled={!file || !projectName.trim() || isBusy}
-          className="w-full bg-brand flex items-center justify-center hover:bg-brand-dark text-white text-sm font-medium mt-4 hover:pointer rounded-lg px-4 py-2 transition disabled:opacity-60"
+          className="mt-4 flex w-full items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-dark disabled:opacity-60"
         >
           {isUploading ? <Loader /> : uploadButtonLabel}
         </button>
