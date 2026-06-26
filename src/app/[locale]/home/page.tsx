@@ -58,7 +58,7 @@ export default function HomePage() {
         <CreateProjectCard isAuthenticated={false} />
       ) : isLoading ? (
         <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-6 text-sm text-[var(--text-muted)]">
-          <Loader className="mx-auto" />
+          <Loader className="mx-auto w-6 h-6 target:animate-spin" />
         </div>
       ) : latestProjects.length === 0 ? (
         <CreateProjectCard isAuthenticated={loggedIn} />

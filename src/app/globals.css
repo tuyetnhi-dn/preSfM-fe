@@ -4,17 +4,16 @@
 
 @layer base {
   :root {
-    --brand: #003b73;        
-    --brand-hover: #002855;  
+    --brand: #003b73;
+    --brand-hover: #002855;
     --brand-active: #001736;
-    --brand-text: #ffffff; 
+    --brand-text: #ffffff;
 
+    --bg-base: #ffffff;
+    --bg-panel: #f5f5f5;
+    --bg-hover: #ebebeb;
 
-    --bg-base: #ffffff;  
-    --bg-panel: #f5f5f5;     
-    --bg-hover: #ebebeb; 
-
-    --text-base: #000000; 
+    --text-base: #000000;
     --text-muted: #666666;
 
     --border-base: #d1d1d1;
@@ -22,20 +21,24 @@
   }
 
   .dark {
-    --brand: #004aad;        
-    --brand-hover: #003b73;  
+    --brand: #004aad;
+    --brand-hover: #003b73;
     --brand-active: #002855;
     --brand-text: #ffffff;
 
     --bg-base: #000000;
-    --bg-panel: #121212; 
-    --bg-hover: #1e1e1e;     
+    --bg-panel: #121212;
+    --bg-hover: #1e1e1e;
 
-    --text-base: #ffffff;  
+    --text-base: #ffffff;
     --text-muted: #a0a0a0;
 
     --border-base: #333333;
     --border-hover: #555555;
+  }
+  .password-input::-ms-reveal,
+  .password-input::-ms-clear {
+    display: none;
   }
 }
 

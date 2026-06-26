@@ -1,12 +1,19 @@
 "use client";
 
+import { PasswordField } from "@/components/PasswordInput";
+import Loader from "@/components/ui/loader";
+import { setAuthStorage } from "@/lib/auth-storage";
+import { useLoginMutation } from "@/services/auth/auth.service";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
-import { useLoginMutation } from "@/services/auth/auth.service";
-import { setAuthStorage } from "@/lib/auth-storage";
-import Loader from "@/components/ui/loader";
+
+type LoginErrors = {
+  email?: string;
+  password?: string;
+  form?: string;
+};
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "data" in error) {
@@ -25,29 +32,72 @@ function getErrorMessage(error: unknown): string {
   return "Đã xảy ra lỗi khi đăng nhập.";
 }
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function getSafeRedirect(redirect: string | null, fallback: string) {
+  if (!redirect) return fallback;
+
+  if (!redirect.startsWith("/")) {
+    return fallback;
+  }
+
+  if (redirect.startsWith("//")) {
+    return fallback;
+  }
+
+  return redirect;
+}
+
 export default function LoginPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [loginMutate, { isLoading }] = useLoginMutation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const searchParams = useSearchParams();
 
-  const onSubmit = async (event: FormEvent) => {
+  const [errors, setErrors] = useState<LoginErrors>({});
+
+  const validateForm = () => {
+    const nextErrors: LoginErrors = {};
+
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail) {
+      nextErrors.email = t("emailRequired");
+    } else if (!isValidEmail(normalizedEmail)) {
+      nextErrors.email = t("emailInvalid");
+    }
+
+    if (!password) {
+      nextErrors.password = t("passwordRequired");
+    }
+
+    setErrors(nextErrors);
+
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoginError("");
+
+    setErrors({});
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       const res = await loginMutate({
-        email,
+        email: email.trim(),
         password,
       }).unwrap();
 
-      // Lưu token và thông tin user vào storage (localStorage/cookies tùy cấu hình của bạn)
       setAuthStorage({
         accessToken: res.accessToken,
         refreshToken: res.refreshToken,
@@ -55,15 +105,18 @@ export default function LoginPage() {
       });
 
       const redirect = searchParams.get("redirect");
+      const fallbackPath = `/${locale}/home`;
+      const targetPath = getSafeRedirect(redirect, fallbackPath);
 
-      // ─── THÊM LOGIC ĐIỀU HƯỚNG THEO ROLE Ở ĐÂY ───
       if (res.user?.role === "admin") {
-        router.push(`/${locale}/admin`);
+        router.push(targetPath);
       } else {
-        router.push(redirect || `/${locale}/home`);
+        router.push(targetPath);
       }
     } catch (error) {
-      setLoginError(getErrorMessage(error));
+      setErrors({
+        form: getErrorMessage(error),
+      });
     }
   };
 
@@ -78,51 +131,88 @@ export default function LoginPage() {
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={t("email")}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-        />
+        <div>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setErrors((current) => ({
+                ...current,
+                email: undefined,
+                form: undefined,
+              }));
+            }}
+            placeholder={t("email")}
+            autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "login-email-error" : undefined}
+            className={[
+              "w-full rounded-xl border bg-white px-4 py-3 text-ink outline-none dark:bg-slate-900 dark:text-slate-100",
+              errors.email
+                ? "border-red-500 focus:border-red-500"
+                : "border-slate-300 focus:border-ocean dark:border-slate-700",
+            ].join(" ")}
+          />
 
-        <input
-          type="password"
-          required
+          {errors.email && (
+            <p id="login-email-error" className="mt-1 text-sm text-red-600">
+              {errors.email}
+            </p>
+          )}
+        </div>
+
+        <PasswordField
+          id="login-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onValueChange={(value) => {
+            setPassword(value);
+            setErrors((current) => ({
+              ...current,
+              password: undefined,
+              form: undefined,
+            }));
+          }}
           placeholder={t("password")}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          error={errors.password}
+          required
+          autoComplete="current-password"
+          className="rounded-xl bg-white px-4 py-3 pr-11 text-ink focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         />
 
-        {loginError ? (
-          <p className="text-sm text-red-600">{loginError}</p>
-        ) : null}
+        {errors.form && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errors.form}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex items-center justify-center rounded-xl bg-brand px-4 py-3 text-center font-medium text-white disabled:opacity-60 dark:bg-brand"
+          className="flex w-full items-center justify-center rounded-xl bg-brand px-4 py-3 text-center font-medium text-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-brand"
         >
-          {isLoading ? <Loader /> : t("login")}
+          {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : t("login")}
         </button>
       </form>
 
       <p className="mt-4 flex flex-wrap items-center gap-2 text-sm text-steel dark:text-slate-300">
         <span>{t("newUser")}</span>
+
         <Link
           href={`/${locale}/auth/register`}
           className="font-medium text-ocean"
         >
           {t("registerWithOtp")}
         </Link>
+
         <span className="text-slate-300 dark:text-slate-600">|</span>
+
         <Link
           href={`/${locale}/auth/forgot-password`}
           className="font-medium text-ocean"
         >
-          Quên mật khẩu?
+          {t("forgotPassword")}
         </Link>
       </p>
     </div>
