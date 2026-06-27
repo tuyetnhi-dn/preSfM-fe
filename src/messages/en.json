@@ -46,6 +46,11 @@
     "register": "Register",
     "alreadyHaveAccount": "Already have account?",
     "forgotPassword": "Forgot password?",
+    "emailRequired": "Please enter your email.",
+    "emailInvalid": "Please enter a valid email.",
+    "passwordRequired": "Please enter your password.",
+    "passwordInvalid": "Please enter a valid password.",
+
     "ResetPassword": {
       "title": "Reset password",
       "description": "Enter a new password for your account.",
@@ -255,5 +260,29 @@
   "viewer": {
     "title": "3D Viewer",
     "modelId": "Model ID"
+  },
+  "AdminDashboard": {
+    "loading": "Loading dashboard...",
+    "errorMessage": "Please check your network connection and try again. If the problem persists, please contact the system administrator.",
+    "title": "System Dashboard",
+    "description": "Overview of PreSfM's system activity.",
+    "cards": {
+      "totalUsers": "Total users",
+      "totalProjects": "Total projects",
+      "runningPipelines": "Running pipelines",
+      "failedPipelines": "Failed pipelines"
+    },
+    "topUsers": {
+      "title": "Top Users",
+      "empty": "No data available.",
+      "projects": "{count, plural, =0 {No projects} =1 {# project} other {# projects}}",
+      "runs": "{count, plural, =0 {No runs} =1 {# run} other {# runs}}"
+    },
+    "pipelineStatus": {
+      "title": "Pipeline Status",
+      "completed": "Completed: {count}",
+      "running": "Running: {count}",
+      "failed": "Failed: {count}"
+    }
   }
 }

@@ -44,6 +44,10 @@
     "register": "Đăng ký",
     "alreadyHaveAccount": "Đã có tài khoản?",
     "forgotPassword": "Quên mật khẩu?",
+    "emailRequired": "Vui lòng nhập email của bạn.",
+    "emailInvalid": "Vui lòng nhập email hợp lệ.",
+    "passwordRequired": "Vui lòng nhập mật khẩu của bạn.",
+    "passwordInvalid": "Vui lòng nhập mật khẩu hợp lệ.",
     "ResetPassword": {
       "title": "Đặt lại mật khẩu",
       "description": "Nhập mật khẩu mới cho tài khoản của bạn.",
@@ -253,5 +257,29 @@
   "viewer": {
     "title": "Trình xem 3D",
     "modelId": "Mã model"
+  },
+  "AdminDashboard": {
+    "loading": "Đang tải bảng điều khiển...",
+    "errorMessage": "Vui lòng kiểm tra kết nối mạng và thử lại. Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ quản trị viên hệ thống.",
+    "title": "Bảng điều khiển hệ thống",
+    "description": "Tổng quan về hoạt động hệ thống của PreSfM.",
+    "cards": {
+      "totalUsers": "Tổng số người dùng",
+      "totalProjects": "Tổng số dự án",
+      "runningPipelines": "Pipeline đang chạy",
+      "failedPipelines": "Pipeline thất bại"
+    },
+    "topUsers": {
+      "title": "Người dùng nổi bật",
+      "empty": "Chưa có dữ liệu.",
+      "projects": "{count} dự án",
+      "runs": "{count} lượt chạy"
+    },
+    "pipelineStatus": {
+      "title": "Trạng thái pipeline",
+      "completed": "Hoàn thành: {count}",
+      "running": "Đang chạy: {count}",
+      "failed": "Thất bại: {count}"
+    }
   }
 }

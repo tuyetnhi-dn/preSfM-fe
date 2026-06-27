@@ -1,3 +1,4 @@
+import { adminApi } from "@/services/admin/admin.service";
 import { authApi } from "@/services/auth/auth.service";
 import { projectApi } from "@/services/project/project.service";
 import { videoApi } from "@/services/video/video.service";
@@ -9,12 +10,14 @@ export const makeStore = () => {
       [authApi.reducerPath]: authApi.reducer,
       [videoApi.reducerPath]: videoApi.reducer,
       [projectApi.reducerPath]: projectApi.reducer,
+      [adminApi.reducerPath]: adminApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(
         authApi.middleware,
         videoApi.middleware,
         projectApi.middleware,
+        adminApi.middleware,
       ),
   });
 };

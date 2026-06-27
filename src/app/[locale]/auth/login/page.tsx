@@ -29,22 +29,46 @@ function getErrorMessage(error: unknown): string {
     }
   }
 
-  return "Đã xảy ra lỗi khi đăng nhập.";
+  return "Login failed. Please try again.";
 }
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function getSafeRedirect(redirect: string | null, fallback: string) {
+function isManagementRole(role?: string) {
+  return role === "admin" || role === "manager";
+}
+
+function getSafeRedirect(input: {
+  redirect: string | null;
+  fallback: string;
+  locale: string;
+  role?: string;
+}) {
+  const { redirect, fallback, locale, role } = input;
+
   if (!redirect) return fallback;
 
-  if (!redirect.startsWith("/")) {
+  if (!redirect.startsWith("/")) return fallback;
+  if (redirect.startsWith("//")) return fallback;
+
+  const localePrefix = `/${locale}`;
+
+  if (!redirect.startsWith(`${localePrefix}/`)) {
     return fallback;
   }
 
-  if (redirect.startsWith("//")) {
+  if (redirect.startsWith(`${localePrefix}/auth`)) {
     return fallback;
+  }
+
+  const isRedirectToAdminPage =
+    redirect === `${localePrefix}/admin` ||
+    redirect.startsWith(`${localePrefix}/admin/`);
+
+  if (isRedirectToAdminPage && !isManagementRole(role)) {
+    return `/${locale}/home`;
   }
 
   return redirect;
@@ -65,7 +89,6 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const nextErrors: LoginErrors = {};
-
     const normalizedEmail = email.trim();
 
     if (!normalizedEmail) {
@@ -105,14 +128,20 @@ export default function LoginPage() {
       });
 
       const redirect = searchParams.get("redirect");
-      const fallbackPath = `/${locale}/home`;
-      const targetPath = getSafeRedirect(redirect, fallbackPath);
 
-      if (res.user?.role === "admin") {
-        router.push(targetPath);
-      } else {
-        router.push(targetPath);
-      }
+      const fallbackPath = isManagementRole(res.user?.role)
+        ? `/${locale}/admin`
+        : `/${locale}/home`;
+
+      const targetPath = getSafeRedirect({
+        redirect,
+        fallback: fallbackPath,
+        locale,
+        role: res.user?.role,
+      });
+
+      router.replace(targetPath);
+      console.log("TOKEN AFTER SAVE", localStorage.getItem("accessToken"));
     } catch (error) {
       setErrors({
         form: getErrorMessage(error),
@@ -130,11 +159,10 @@ export default function LoginPage() {
         {t("loginSubtitle")}
       </p>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+      <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
         <div>
           <input
             type="email"
-            required
             value={email}
             onChange={(event) => {
               setEmail(event.target.value);
@@ -176,7 +204,6 @@ export default function LoginPage() {
           }}
           placeholder={t("password")}
           error={errors.password}
-          required
           autoComplete="current-password"
           className="rounded-xl bg-white px-4 py-3 pr-11 text-ink focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         />

@@ -1,9 +1,9 @@
 import { NextIntlClientProvider } from "next-intl";
 import { unstable_setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Navbar } from "@/components/layout/navbar";
 import StoreProvider from "@/providers/StoreProvider";
 import { PipelineNotificationWatcher } from "@/components/pipeline/PipelineNotificationWatcher";
+import { RoleBasedShell } from "@/components/layout/RoleBasedShell";
 
 const locales = ["en", "vi"];
 
@@ -30,11 +30,10 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <Navbar />
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl px-4">
         <StoreProvider>
           <PipelineNotificationWatcher />
-          {children}
+          <RoleBasedShell>{children}</RoleBasedShell>
         </StoreProvider>
       </main>
     </NextIntlClientProvider>
