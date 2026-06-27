@@ -7,7 +7,7 @@ import { useLoginMutation } from "@/services/auth/auth.service";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 
 type LoginErrors = {
   email?: string;
@@ -74,7 +74,7 @@ function getSafeRedirect(input: {
   return redirect;
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
@@ -243,5 +243,12 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

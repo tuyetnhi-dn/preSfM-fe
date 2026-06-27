@@ -5,7 +5,7 @@ import { useResetPasswordMutation } from "@/services/auth/auth.service";
 import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import toast from "react-hot-toast";
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -34,7 +34,7 @@ type ResetPasswordErrors = {
   confirmPassword?: string;
 };
 
-export default function ResetPasswordForm() {
+function ResetPasswordFormContent() {
   const t = useTranslations("auth.ResetPassword");
   const locale = useLocale();
 
@@ -160,5 +160,13 @@ export default function ResetPasswordForm() {
         </button>
       </form>
     </main>
+  );
+}
+
+export default function ResetPasswordForm() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordFormContent />
+    </Suspense>
   );
 }

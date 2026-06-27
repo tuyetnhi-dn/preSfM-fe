@@ -8,7 +8,14 @@ import {
 import { useLazyGetMeQuery } from "@/services/auth/auth.service";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ReactNode,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { AdminTaskbar } from "./AdminTaskbar";
 import { Navbar } from "./navbar";
 
@@ -39,7 +46,7 @@ function isUnauthorizedError(error: unknown) {
   return status === 401 || status === 403;
 }
 
-export function RoleBasedShell({ children }: RoleBasedShellProps) {
+function RoleBasedShellContent({ children }: RoleBasedShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -246,5 +253,12 @@ export function RoleBasedShell({ children }: RoleBasedShellProps) {
       <Navbar />
       {children}
     </>
+  );
+}
+export function RoleBasedShell({ children }: RoleBasedShellProps) {
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <RoleBasedShellContent>{children}</RoleBasedShellContent>
+    </Suspense>
   );
 }
