@@ -30,7 +30,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <main className="mx-auto w-full max-w-7xl px-4">
+      <main className="mx-auto w-full max-w-7xl">
         <StoreProvider>
           <PipelineNotificationWatcher />
           <RoleBasedShell>{children}</RoleBasedShell>

@@ -4,6 +4,7 @@ import type {
   LatestProjectPipelineResponse,
   ProjectAssetsResponse,
   ProjectDetailResponse,
+  ProjectPlyViewerAssetsResponse,
 } from "@/types/dtos/project/project-detail.dto";
 import {
   PaginatedResponse,
@@ -108,6 +109,15 @@ export const projectApi = createApi({
         },
       }),
     }),
+    getProjectPlyViewerAssets: builder.query<
+      ProjectPlyViewerAssetsResponse,
+      string
+    >({
+      query: (projectId) => `/projects/${projectId}/ply-viewer-assets`,
+      providesTags: (_result, _error, projectId) => [
+        { type: "Project", id: `${projectId}-ply-viewer-assets` },
+      ],
+    }),
   }),
 });
 
@@ -117,4 +127,5 @@ export const {
   useGetLatestProjectPipelineQuery,
   useGetProjectsQuery,
   useUpdateProjectVisibilityMutation,
+  useGetProjectPlyViewerAssetsQuery,
 } = projectApi;

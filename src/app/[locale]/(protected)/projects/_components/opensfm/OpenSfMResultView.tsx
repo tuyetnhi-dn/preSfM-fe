@@ -1,8 +1,10 @@
 import { PointCloudViewer } from "@/components/viewer/point-cloud-viewer";
 import { OpenSfMMetricsTable } from "./OpenSfMMetricsTable";
+import { FrameAlignedPlyCompare } from "./FrameAlignedPlyCompare";
 import { useTranslations } from "next-intl";
 
 type Props = {
+  projectId?: string;
   result: any;
 };
 
@@ -15,7 +17,7 @@ function buildStorageDownloadUrl(fileId?: string | null) {
   return `${baseUrl}/storage/files/${fileId}/download`;
 }
 
-export function OpenSfMResultView({ result }: Props) {
+export function OpenSfMResultView({ projectId, result }: Props) {
   const rawPlyUrl = buildStorageDownloadUrl(result?.rawFlow?.ply?.id);
   const processedPlyUrl = buildStorageDownloadUrl(
     result?.processedFlow?.ply?.id,
@@ -35,49 +37,57 @@ export function OpenSfMResultView({ result }: Props) {
         {t("description")}
       </p>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        {rawPlyUrl ? (
-          <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
-                {t("rawFlowTitle")}
-              </h4>
+      {projectId ? (
+        <FrameAlignedPlyCompare projectId={projectId} />
+      ) : (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {rawPlyUrl ? (
+            <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
+                  {t("rawFlowTitle")}
+                </h4>
 
-              <a
-                href={rawPlyUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-medium text-blue-600 hover:underline"
-              >
-                {t("downloadPLY")}
-              </a>
+                <a
+                  href={rawPlyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-medium text-blue-600 hover:underline"
+                >
+                  {t("downloadPLY")}
+                </a>
+              </div>
+
+              <PointCloudViewer title={t("rawFlowTitle")} plyUrl={rawPlyUrl} />
             </div>
+          ) : null}
 
-            <PointCloudViewer plyUrl={rawPlyUrl} />
-          </div>
-        ) : null}
+          {processedPlyUrl ? (
+            <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
+                  {t("processedFlowTitle")}
+                </h4>
 
-        {processedPlyUrl ? (
-          <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <h4 className="text-sm font-semibold text-ink dark:text-slate-100">
-                {t("processedFlowTitle")}
-              </h4>
+                <a
+                  href={processedPlyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-medium text-blue-600 hover:underline"
+                >
+                  {t("downloadPLY")}
+                </a>
+              </div>
 
-              <a
-                href={processedPlyUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-medium text-blue-600 hover:underline"
-              >
-                {t("downloadPLY")}
-              </a>
+              <PointCloudViewer
+                title={t("processedFlowTitle")}
+                plyUrl={processedPlyUrl}
+              />
             </div>
+          ) : null}
+        </div>
+      )}
 
-            <PointCloudViewer plyUrl={processedPlyUrl} />
-          </div>
-        ) : null}
-      </div>
       <div className="mt-4">
         <OpenSfMMetricsTable
           raw={rawMetrics}

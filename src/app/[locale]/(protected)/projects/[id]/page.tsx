@@ -362,7 +362,12 @@ export default function ProjectDetailPage() {
         />
       ) : null}
 
-      {hasResult ? <OpenSfMResultView result={latestPipeline?.result} /> : null}
+      {hasResult ? (
+        <OpenSfMResultView
+          projectId={projectId}
+          result={latestPipeline?.result}
+        />
+      ) : null}
 
       {isCompleted && !hasResult ? (
         <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5 text-sm text-[var(--text-muted)]">
