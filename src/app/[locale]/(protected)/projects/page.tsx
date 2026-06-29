@@ -86,7 +86,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full   px-4 py-8 sm:px-6 lg:px-8">
       <section className="mb-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

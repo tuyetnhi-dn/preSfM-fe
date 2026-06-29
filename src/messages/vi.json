@@ -250,7 +250,8 @@
     "toast": {
       "visibilityPublic": "Project đã chuyển sang Public.",
       "visibilityPrivate": "Project đã chuyển sang Private.",
-      "visibilityFailed": "Không thể cập nhật chế độ hiển thị."
+      "visibilityFailed": "Không thể cập nhật chế độ hiển thị.",
+      "invalidSession": "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại."
     }
   },
 

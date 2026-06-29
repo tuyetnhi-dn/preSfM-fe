@@ -21,7 +21,7 @@ import {
 import { useLocale } from "next-intl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-US");

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
 
 import { getCurrentUser } from "@/lib/auth-storage";
 import {
@@ -15,6 +14,7 @@ import { usePipelineStore } from "@/store/pipeline-store";
 import { ProjectUploadPanel } from "../_components/upload/ProjectUploadPanel";
 import type { UploadedVideoState } from "../_components/types";
 import { getErrorMessage } from "../_components/utils";
+import { toast } from "sonner";
 
 type ProjectVisibility = "public" | "private";
 

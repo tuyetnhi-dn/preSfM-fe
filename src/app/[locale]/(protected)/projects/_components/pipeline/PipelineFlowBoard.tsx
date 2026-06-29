@@ -29,7 +29,7 @@ export function PipelineFlowBoard({
   if (!uploadedVideo) return null;
 
   return (
-    <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-white/5">
+    <div className="mt-8 rounded-2xl border border-border-base bg-bg-panel p-6 dark:border-border-base dark:bg-panel">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-ink dark:text-slate-100">

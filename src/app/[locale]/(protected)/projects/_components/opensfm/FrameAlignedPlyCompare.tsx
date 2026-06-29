@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { PointCloudViewer } from "@/components/viewer/point-cloud-viewer";
 import { useGetProjectPlyViewerAssetsQuery } from "@/services/project/project.service";
+import { EyeIcon } from "lucide-react";
 
 type Props = {
   projectId: string;
@@ -12,6 +13,14 @@ type ViewpointLike = {
   position?: number[] | null;
   target?: number[] | null;
   up?: number[] | null;
+  fov?: number | null;
+};
+
+type PointCloudViewpoint = {
+  position: [number, number, number];
+  target: [number, number, number];
+  up: [number, number, number];
+  fov?: number | null;
 };
 
 function formatTime(timestampMs?: number | null) {
@@ -26,7 +35,41 @@ function formatTime(timestampMs?: number | null) {
     .padStart(5, "0")}`;
 }
 
-function vectorKey(value?: number[] | null) {
+function toTuple3(value?: number[] | null): [number, number, number] | null {
+  if (!Array.isArray(value) || value.length !== 3) return null;
+
+  const [x, y, z] = value.map(Number);
+
+  if (![x, y, z].every(Number.isFinite)) return null;
+
+  return [x, y, z];
+}
+
+function normalizeViewpoint(
+  viewpoint?: ViewpointLike | null,
+): PointCloudViewpoint | undefined {
+  if (!viewpoint) return undefined;
+
+  const position = toTuple3(viewpoint.position);
+  const target = toTuple3(viewpoint.target);
+  const up = toTuple3(viewpoint.up);
+
+  if (!position || !target || !up) return undefined;
+
+  return {
+    position,
+    target,
+    up,
+    fov:
+      viewpoint.fov !== null &&
+      viewpoint.fov !== undefined &&
+      Number.isFinite(Number(viewpoint.fov))
+        ? Number(viewpoint.fov)
+        : undefined,
+  };
+}
+
+function vectorKey(value?: [number, number, number] | null) {
   if (!value?.length) return "null";
 
   return value.map((item) => Number(item).toFixed(6)).join(",");
@@ -36,7 +79,7 @@ function buildViewpointKey(input: {
   prefix: string;
   frameId?: string | null;
   frameIndex: number;
-  viewpoint?: ViewpointLike | null;
+  viewpoint?: PointCloudViewpoint | null;
 }) {
   const viewpoint = input.viewpoint;
 
@@ -54,6 +97,7 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
     projectId,
     {
       skip: !projectId,
+      refetchOnMountOrArgChange: true,
     },
   );
 
@@ -61,6 +105,16 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
 
   const frames = data?.frames ?? [];
   const selectedFrame = frames[selectedIndex] ?? null;
+
+  const rawViewpoint = useMemo(
+    () => normalizeViewpoint(selectedFrame?.rawViewpoint),
+    [selectedFrame?.rawViewpoint],
+  );
+
+  const processedViewpoint = useMemo(
+    () => normalizeViewpoint(selectedFrame?.processedViewpoint),
+    [selectedFrame?.processedViewpoint],
+  );
 
   useEffect(() => {
     if (!frames.length) {
@@ -88,9 +142,9 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
         prefix: "raw",
         frameId: selectedFrame?.frameId,
         frameIndex: selectedIndex,
-        viewpoint: selectedFrame?.rawViewpoint,
+        viewpoint: rawViewpoint,
       }),
-    [selectedFrame?.frameId, selectedFrame?.rawViewpoint, selectedIndex],
+    [rawViewpoint, selectedFrame?.frameId, selectedIndex],
   );
 
   const processedViewpointKey = useMemo(
@@ -99,9 +153,9 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
         prefix: "processed",
         frameId: selectedFrame?.frameId,
         frameIndex: selectedIndex,
-        viewpoint: selectedFrame?.processedViewpoint,
+        viewpoint: processedViewpoint,
       }),
-    [selectedFrame?.frameId, selectedFrame?.processedViewpoint, selectedIndex],
+    [processedViewpoint, selectedFrame?.frameId, selectedIndex],
   );
 
   const previewImageUrl =
@@ -117,6 +171,8 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
       : selectedFrame?.maskUrl
         ? "Mask frame"
         : "No image";
+
+  const frameStats = data?.frameStats;
 
   function selectFrame(index: number) {
     if (!frames.length) return;
@@ -146,39 +202,34 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
   }
 
   return (
-    <section className="mt-4 w-full rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+    <section className="relative px-8 left-1/2 mt-4 w-[calc(100vw-2rem)] max-w-none -translate-x-1/2">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
-            So sánh PLY theo khung hình
-          </h3>
+        <div className="flex shrink-0 items-center gap-2">
+          {frameStats ? (
+            <div className="hidden rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300 sm:block">
+              Synced: {frameStats.syncedFrames}/{frameStats.totalSelectedFrames}
+            </div>
+          ) : null}
 
-          <p className="text-xs text-steel dark:text-slate-400">
-            Chọn frame để đồng bộ góc nhìn giữa Raw PLY và Processed PLY.
-          </p>
-        </div>
-
-        <div className="shrink-0 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          {selectedIndex + 1} / {frames.length} frame
+          <div className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+            {selectedIndex + 1} / {frames.length}
+          </div>
         </div>
       </div>
 
-      <div className="grid h-[calc(100vh-175px)] min-h-[560px] w-full grid-cols-6 grid-rows-[145px_minmax(0,1fr)] gap-3 overflow-hidden">
-        <div className="col-span-2 row-span-1 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+      <div className="grid w-full gap-3 overflow-hidden xl:h-[calc(100vh-190px)] xl:min-h-[500px] xl:grid-cols-2 xl:grid-rows-[80px_180px_minmax(0,1fr)]">
+        {/* 1. Frame control */}
+        <div className="min-w-0 overflow-hidden rounded-xl border border-slate-200 px-3 pt-3 dark:border-slate-700 xl:col-start-1 xl:row-start-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-slate-900 dark:text-slate-100">
+              <span className="truncate text-xs font-semibold text-slate-900 dark:text-slate-100">
                 {selectedFrame?.frameName ?? "No frame"}
-              </p>
+              </span>
 
-              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="ml-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                 Time: {selectedTime}
-              </p>
+              </span>
             </div>
-
-            <span className="shrink-0 rounded-md bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
-              Selected
-            </span>
           </div>
 
           <input
@@ -187,57 +238,34 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
             max={Math.max(frames.length - 1, 0)}
             value={selectedIndex}
             onChange={(event) => selectFrame(Number(event.target.value))}
-            className="mt-4 w-full"
+            className="w-full"
           />
 
-          <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+          <div className="mt-0 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>1</span>
             <span>{frames.length}</span>
           </div>
         </div>
 
-        <div className="col-span-2 row-span-1 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-950">
-          <div className="mb-1 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">
-              Frame preview
-            </p>
-
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-              {previewLabel}
-            </span>
+        {/* 2. Frame list */}
+        <div className="min-w-0 overflow-hidden rounded-xl border border-border-base dark:border-border-base xl:col-start-1 xl:row-start-2">
+          <div className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 dark:border-border-base dark:text-slate-200">
+            Frame
           </div>
 
-          {previewImageUrl ? (
-            <img
-              src={previewImageUrl}
-              alt="Selected frame"
-              className="h-[108px] w-full rounded-lg object-contain"
-            />
-          ) : (
-            <div className="flex h-[108px] items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-500 dark:bg-slate-800">
-              No image
-            </div>
-          )}
-        </div>
-
-        <div className="col-span-2 row-span-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-          <div className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-200">
-            Frame có đủ pose
-          </div>
-
-          <div className="h-[105px] overflow-y-auto">
+          <div className="h-full overflow-y-auto">
             {frames.map((frame, index) => {
               const isActive = index === selectedIndex;
 
               return (
                 <button
-                  key={frame.frameId}
+                  key={frame.frameId ?? `${frame.frameIndex}-${index}`}
                   type="button"
                   onClick={() => selectFrame(index)}
-                  className={`grid w-full grid-cols-[1fr_auto] items-center gap-2 border-b border-slate-100 px-3 py-1.5 text-left text-xs last:border-b-0 dark:border-slate-800 ${
+                  className={`grid w-full grid-cols-[1fr_auto] items-center gap-2 border-b border-border-base px-3 py-1.5 text-left text-xs last:border-b-0 dark:border-border-base ${
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-950/30"
-                      : "bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800"
+                      ? "bg-bg-hover dark:bg-bg-hover/80"
+                      : "bg-bg-base hover:bg-bg-base/25 dark:bg-bg-base dark:hover:bg-bg-base/25"
                   }`}
                 >
                   <span className="min-w-0">
@@ -253,11 +281,11 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
                   <span
                     className={`rounded-md px-2 py-1 text-[10px] font-semibold ${
                       isActive
-                        ? "bg-blue-600 text-white"
-                        : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300"
+                        ? "bg-brand text-white"
+                        : "bg-bg-base text-slate-500 dark:bg-slate-800 dark:text-slate-300"
                     }`}
                   >
-                    Xem
+                    <EyeIcon className="inline h-3 w-3" />
                   </span>
                 </button>
               );
@@ -265,12 +293,28 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
           </div>
         </div>
 
-        <div className="col-span-3 row-span-1 min-h-0 overflow-hidden">
+        {/* 3. Frame preview */}
+        <div className="min-w-0 overflow-hidden rounded-xl  p-2  xl:col-start-2 xl:row-start-1 xl:row-span-2">
+          {previewImageUrl ? (
+            <img
+              src={previewImageUrl}
+              alt="Selected frame"
+              className="h-[calc(100%-24px)] w-full rounded-lg object-contain"
+            />
+          ) : (
+            <div className="flex h-[calc(100%-24px)] items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-500 dark:bg-slate-800">
+              No image
+            </div>
+          )}
+        </div>
+
+        {/* 4. Raw PLY */}
+        <div className="min-h-0 min-w-0 overflow-hidden rounded-xl xl:col-start-1 xl:row-start-3">
           {data?.pointClouds.rawPlyUrl ? (
             <PointCloudViewer
               title="Raw PLY"
               plyUrl={data.pointClouds.rawPlyUrl}
-              viewpoint={selectedFrame?.rawViewpoint ?? undefined}
+              viewpoint={rawViewpoint}
               viewpointKey={rawViewpointKey}
               className="h-full min-h-0 w-full"
               viewerClassName="min-h-0"
@@ -278,12 +322,13 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
           ) : null}
         </div>
 
-        <div className="col-span-3 row-span-1 min-h-0 overflow-hidden">
+        {/* 5. Processed PLY */}
+        <div className="min-h-0 min-w-0 overflow-hidden rounded-xl xl:col-start-2 xl:row-start-3">
           {data?.pointClouds.processedPlyUrl ? (
             <PointCloudViewer
               title="Processed PLY"
               plyUrl={data.pointClouds.processedPlyUrl}
-              viewpoint={selectedFrame?.processedViewpoint ?? undefined}
+              viewpoint={processedViewpoint}
               viewpointKey={processedViewpointKey}
               className="h-full min-h-0 w-full"
               viewerClassName="min-h-0"

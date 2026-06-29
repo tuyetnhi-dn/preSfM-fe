@@ -250,11 +250,11 @@
       "densePoints": "Dense points",
       "reprojectionError": "Reprojection error"
     },
-
     "toast": {
       "visibilityPublic": "Project is now public.",
       "visibilityPrivate": "Project is now private.",
-      "visibilityFailed": "Could not update project visibility."
+      "visibilityFailed": "Could not update project visibility.",
+      "invalidSession": "Invalid session. Please sign in again."
     }
   },
   "viewer": {

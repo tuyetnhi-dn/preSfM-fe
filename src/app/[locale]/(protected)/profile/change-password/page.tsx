@@ -6,7 +6,7 @@ import { useChangePasswordMutation } from "@/services/auth/auth.service";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 type ChangePasswordErrors = {
   oldPassword?: string;

@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
+
 import {
   CheckCircle2,
   Clock3,
@@ -36,6 +36,7 @@ import {
 
 import type { UploadedVideoState } from "../_components/types";
 import { VideoPreview } from "../_components/upload/VideoPreview";
+import { toast } from "sonner";
 
 type PipelineStatus =
   | "pending"
@@ -75,18 +76,6 @@ function StatusIcon({ status }: { status?: string | null }) {
   }
 
   return <Clock3 className="h-4 w-4 text-[var(--text-muted)]" />;
-}
-
-function formatNumber(value?: number | null) {
-  if (value === null || value === undefined) return "--";
-
-  return new Intl.NumberFormat("vi-VN").format(value);
-}
-
-function formatPercent(value?: number | null) {
-  if (value === null || value === undefined) return "--";
-
-  return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
 export default function ProjectDetailPage() {
@@ -228,17 +217,17 @@ export default function ProjectDetailPage() {
 
   if (isLoadingProject || isLoadingPipeline) {
     return (
-      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full   px-4 py-8 sm:px-6 lg:px-8">
         <Loader className="mx-auto animate-spin w-8 h-8" />
       </main>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <section className="overflow-hidden rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)]">
         <div className="grid gap-0 lg:grid-cols-[420px_1fr]">
-          <div className="min-h-64 border-b border-[var(--border-base)] bg-[var(--bg-hover)] lg:border-b-0 lg:border-r">
+          <div className=" flex min-h-64 border-b border-[var(--border-base)] bg-[var(--bg-hover)] lg:border-b-0 lg:border-r items-center">
             {assets?.video?.url ? (
               <VideoPreview
                 src={assets.video.url}
@@ -247,7 +236,7 @@ export default function ProjectDetailPage() {
                 emptyText={t("noVideo")}
               />
             ) : (
-              <LoaderIcon className="mx-auto text-center animate-spin w-8 h-8" />
+              <Loader2 className="mx-auto animate-spin w-8 h-8" />
             )}
           </div>
 
@@ -323,31 +312,16 @@ export default function ProjectDetailPage() {
       </section>
 
       {shouldPollPipeline ? (
-        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-5">
+        <section>
           <div className="flex items-start gap-3">
-            <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-[var(--brand)]" />
-
-            <div>
-              <h2 className="text-sm font-semibold text-[var(--text-base)]">
-                {t("runningTitle")}
-              </h2>
-
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {t("runningDescription", {
-                  stage: latestPipeline?.currentStage ?? "pipeline_running",
-                })}
-              </p>
-            </div>
+            <Loader2 className="mt-0.5 h-5 w-5 animate-spin" />
           </div>
         </section>
       ) : null}
 
       {isLoadingAssets && !hasAnyAssets ? (
-        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-panel)] p-6">
-          <Loader className="mx-auto" />
-          <p className="mt-3 text-center text-sm text-[var(--text-muted)]">
-            {t("loadingAssets")}
-          </p>
+        <section>
+          <Loader2 className="mx-auto w-8 h-8 animate-spin min-h-[50vh]" />
         </section>
       ) : null}
 

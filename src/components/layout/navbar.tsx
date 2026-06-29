@@ -45,7 +45,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-white/70 backdrop-blur dark:border-white/10 dark:bg-bg-panel">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full   items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href={`/${locale}/home`}
           className="text-xl font-semibold tracking-tight text-ink dark:text-brand-100"

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth-storage";
@@ -17,7 +17,17 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [checked, setChecked] = useState(false);
   const [allowed, setAllowed] = useState(false);
 
+  const isPublicProjectDetailRoute = useMemo(() => {
+    return new RegExp(`^/${locale}/projects/[^/]+$`).test(pathname);
+  }, [locale, pathname]);
+
   useEffect(() => {
+    if (isPublicProjectDetailRoute) {
+      setAllowed(true);
+      setChecked(true);
+      return;
+    }
+
     if (!isAuthenticated()) {
       const redirectUrl = encodeURIComponent(pathname);
       router.replace(`/${locale}/auth/login?redirect=${redirectUrl}`);
@@ -28,7 +38,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     setAllowed(true);
     setChecked(true);
-  }, [locale, pathname, router]);
+  }, [isPublicProjectDetailRoute, locale, pathname, router]);
 
   if (!checked || !allowed) {
     return null;

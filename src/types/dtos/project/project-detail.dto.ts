@@ -77,4 +77,10 @@ export type ProjectPlyViewerAssetsResponse = {
   };
 
   frames: PlyViewerFrame[];
+  frameStats?: {
+    totalSelectedFrames: number;
+    syncedFrames: number;
+    rawShotCount: number;
+    processedShotCount: number;
+  };
 };

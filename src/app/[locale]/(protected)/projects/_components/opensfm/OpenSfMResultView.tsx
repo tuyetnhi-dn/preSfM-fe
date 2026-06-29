@@ -28,7 +28,7 @@ export function OpenSfMResultView({ projectId, result }: Props) {
   const t = useTranslations("projects.opensfmResultView");
 
   return (
-    <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+    <div className="mt-6 px-2">
       <h3 className="text-sm font-semibold text-ink dark:text-slate-100">
         {t("title")}
       </h3>

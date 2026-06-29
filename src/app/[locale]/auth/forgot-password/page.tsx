@@ -3,7 +3,7 @@
 import { useForgotPasswordMutation } from "@/services/auth/auth.service";
 import { useLocale } from "next-intl";
 import { FormEvent, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (typeof error === "object" && error !== null && "data" in error) {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 
 import { useGetPipelineRunStatusQuery } from "@/services/video/video.service";
 import { usePipelineStore } from "@/store/pipeline-store";
@@ -9,6 +8,7 @@ import {
   requestBrowserNotificationPermission,
   sendBrowserNotification,
 } from "@/lib/notify";
+import { toast } from "sonner";
 
 function PipelinePoller({ pipelineRunId }: { pipelineRunId: string }) {
   const updatePipeline = usePipelineStore((s) => s.updatePipeline);
