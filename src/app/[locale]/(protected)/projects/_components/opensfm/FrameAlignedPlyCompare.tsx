@@ -202,7 +202,7 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
   }
 
   return (
-    <section className="relative px-8 left-1/2 mt-4 w-[calc(100vw-2rem)] max-w-none -translate-x-1/2">
+    <section className="mt-4 w-full max-w-full overflow-hidden px-4 lg:px-8">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex shrink-0 items-center gap-2">
           {frameStats ? (

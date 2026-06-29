@@ -121,7 +121,7 @@ export function AdminTaskbar({ children, user }: AdminTaskbarProps) {
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1 lg:pl-64">
+      <div className="min-w-0 flex-1 lg:pl-64 lg:ml-3">
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div>

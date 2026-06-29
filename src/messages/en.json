@@ -284,5 +284,16 @@
       "running": "Running: {count}",
       "failed": "Failed: {count}"
     }
+  },
+  "ForgotPassword": {
+    "title": "Forgot Password",
+    "description": "Enter your email to receive a password reset link.",
+    "emailPlaceholder": "Enter your email",
+    "submitButton": "Submit",
+    "sending": "Sending...",
+    "success": "A password reset link has been sent to your email.",
+    "failed": "Failed to send reset link. Please try again.",
+    "emailRequired": "Please enter your email.",
+    "emailInvalid": "Please enter a valid email."
   }
 }

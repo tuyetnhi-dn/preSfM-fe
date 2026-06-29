@@ -8,7 +8,7 @@ import {
   useRegisterWithOtpMutation,
   useSendOtpMutation,
 } from "@/services/auth/auth.service";
-import Loader from "@/components/ui/loader";
+import { Loader2 } from "lucide-react";
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "data" in error) {
@@ -103,8 +103,16 @@ export default function RegisterPage() {
           placeholder={t("email")}
           className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         />
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder={t("password")}
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        />
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="text"
             value={otp}
@@ -117,20 +125,11 @@ export default function RegisterPage() {
             type="button"
             disabled={isSendingOtp || !email}
             onClick={onSendOtp}
-            className="rounded-xl bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
+            className="rounded-xl text-nowrap bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
           >
             {otpSent ? t("resend") : t("sendOtp")}
           </button>
         </div>
-
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={t("password")}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink outline-none focus:border-ocean dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-        />
 
         {registerError ? (
           <p className="text-sm text-red-600">{registerError}</p>
@@ -141,7 +140,11 @@ export default function RegisterPage() {
           disabled={loading || !otp}
           className="w-full flex items-center justify-center rounded-xl bg-brand dark:bg-brand px-4 py-3 font-medium text-white disabled:opacity-60"
         >
-          {isRegistering ? <Loader /> : t("register")}
+          {isRegistering ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            t("register")
+          )}
         </button>
       </form>
 

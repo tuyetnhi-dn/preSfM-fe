@@ -1,7 +1,8 @@
 "use client";
 
 import { useForgotPasswordMutation } from "@/services/auth/auth.service";
-import { useLocale } from "next-intl";
+import { Loader2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 
@@ -27,6 +28,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 
 export default function ForgotPasswordPage() {
   const locale = useLocale() || "en";
+  const t = useTranslations("ForgotPassword");
 
   const [email, setEmail] = useState("");
 
@@ -38,7 +40,7 @@ export default function ForgotPasswordPage() {
     const normalizedEmail = email.trim();
 
     if (!normalizedEmail) {
-      toast.error("Vui lòng nhập email.");
+      toast.error(t("emailRequired"));
       return;
     }
 
@@ -48,28 +50,24 @@ export default function ForgotPasswordPage() {
         locale,
       }).unwrap();
 
-      toast.success("Link đặt lại mật khẩu đã được gửi tới email.");
+      toast.success(t("success"));
     } catch (error) {
-      toast.error(
-        getErrorMessage(error, "Không thể gửi email đặt lại mật khẩu."),
-      );
+      toast.error(getErrorMessage(error, t("failed")));
     }
   };
 
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-bold">Quên mật khẩu</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
 
-      <p className="mt-2 text-sm text-slate-500">
-        Nhập email để nhận link đặt lại mật khẩu.
-      </p>
+      <p className="mt-2 text-sm text-slate-500">{t("description")}</p>
 
       <form onSubmit={submit}>
         <input
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email"
+          placeholder={t("emailPlaceholder")}
           autoComplete="email"
           className="mt-6 w-full rounded-lg border px-3 py-2"
         />
@@ -77,9 +75,13 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-4 w-full rounded-lg bg-brand px-4 py-2 text-white disabled:opacity-60"
+          className="mt-4 w-full flex items-center justify-center text-base rounded-lg bg-brand px-4 py-2 text-white disabled:opacity-60"
         >
-          {isLoading ? "Đang gửi..." : "Gửi link đặt lại mật khẩu"}
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 items-center animate-spin" />
+          ) : (
+            t("submitButton")
+          )}
         </button>
       </form>
     </main>

@@ -282,5 +282,17 @@
       "running": "Đang chạy: {count}",
       "failed": "Thất bại: {count}"
     }
+  },
+  "ForgotPassword": {
+    "title": "Quên mật khẩu",
+    "description": "Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu.",
+    "emailPlaceholder": "Nhập email của bạn",
+    "submitButton": "Gửi",
+    "sending": "Đang gửi...",
+    "successMessage": "Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.",
+    "errorMessage": "Không thể gửi hướng dẫn. Vui lòng kiểm tra email và thử lại.",
+    "emailRequired": "Vui lòng nhập email của bạn.",
+    "emailInvalid": "Vui lòng nhập email hợp lệ.",
+    "failed": "Không thể gửi hướng dẫn. Vui lòng thử lại sau."
   }
 }
