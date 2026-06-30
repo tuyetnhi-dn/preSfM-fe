@@ -11,8 +11,7 @@ type Props = {
 function buildStorageDownloadUrl(fileId?: string | null) {
   if (!fileId) return "";
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   return `${baseUrl}/storage/files/${fileId}/download`;
 }

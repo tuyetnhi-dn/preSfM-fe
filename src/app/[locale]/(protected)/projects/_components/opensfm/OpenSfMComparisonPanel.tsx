@@ -60,8 +60,7 @@ function getDownloadUrl(file: StorageUploadDto | null | undefined) {
 
   if (!id) return null;
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   return `${baseUrl}/storage/files/${encodeURIComponent(id)}/download`;
 }
