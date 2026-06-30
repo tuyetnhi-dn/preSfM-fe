@@ -308,7 +308,7 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
         <div className="min-w-0 overflow-hidden rounded-xl  p-2  xl:col-start-2 xl:row-start-1 xl:row-span-2">
           {previewImageUrl ? (
             <img
-              src={previewImageUrl}
+              src={normalizeApiUrl(previewImageUrl)}
               alt="Selected frame"
               className="h-[calc(100%-24px)] w-full rounded-lg object-contain"
             />
