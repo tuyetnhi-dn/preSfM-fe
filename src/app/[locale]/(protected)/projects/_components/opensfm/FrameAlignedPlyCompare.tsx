@@ -22,6 +22,17 @@ type PointCloudViewpoint = {
   up: [number, number, number];
   fov?: number | null;
 };
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api"
+).replace(/\/$/, "");
+
+function normalizeApiUrl(url?: string | null) {
+  if (!url) return "";
+
+  return url
+    .replace("http://localhost:8000/api", API_BASE_URL)
+    .replace("http://127.0.0.1:8000/api", API_BASE_URL);
+}
 
 function formatTime(timestampMs?: number | null) {
   if (timestampMs === null || timestampMs === undefined) return "--:--";
@@ -313,7 +324,7 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
           {data?.pointClouds.rawPlyUrl ? (
             <PointCloudViewer
               title="Raw PLY"
-              plyUrl={data.pointClouds.rawPlyUrl}
+              plyUrl={normalizeApiUrl(data.pointClouds.rawPlyUrl)}
               viewpoint={rawViewpoint}
               viewpointKey={rawViewpointKey}
               className="h-full min-h-0 w-full"
@@ -327,7 +338,7 @@ export function FrameAlignedPlyCompare({ projectId }: Props) {
           {data?.pointClouds.processedPlyUrl ? (
             <PointCloudViewer
               title="Processed PLY"
-              plyUrl={data.pointClouds.processedPlyUrl}
+              plyUrl={normalizeApiUrl(data.pointClouds.processedPlyUrl)}
               viewpoint={processedViewpoint}
               viewpointKey={processedViewpointKey}
               className="h-full min-h-0 w-full"
